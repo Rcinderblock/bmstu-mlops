@@ -44,13 +44,17 @@ def build_prompt(tokenizer, params: dict, text: str) -> str:
     )
 
 
-def generate(tokenizer, model, params: dict, text: str) -> tuple[str, int]:
-    """Сгенерировать ответ. Возвращает текст и число новых токенов."""
+def prepare_inputs(tokenizer, model, params: dict, text: str):
+    """Подготовить запрос вне измеряемого интервала генерации."""
     prompt = build_prompt(tokenizer, params, text)
     # Шаблон диалога уже добавил служебные токены: не добавляем их повторно.
-    inputs = tokenizer(
+    return tokenizer(
         prompt, return_tensors="pt", add_special_tokens=False
     ).to(model.device)
+
+
+def generate_tokens(model, params: dict, inputs):
+    """Получить только новые токены, без токенизации и декодирования текста."""
     temperature = params["generate"]["temperature"]
 
     with torch.inference_mode():
@@ -61,5 +65,11 @@ def generate(tokenizer, model, params: dict, text: str) -> tuple[str, int]:
             **({"temperature": temperature} if temperature > 0 else {}),
         )
 
-    new_tokens = output[0][inputs["input_ids"].shape[1]:]
+    return output[0][inputs["input_ids"].shape[1]:]
+
+
+def generate(tokenizer, model, params: dict, text: str) -> tuple[str, int]:
+    """Сгенерировать ответ. Возвращает текст и число новых токенов."""
+    inputs = prepare_inputs(tokenizer, model, params, text)
+    new_tokens = generate_tokens(model, params, inputs)
     return tokenizer.decode(new_tokens, skip_special_tokens=True), len(new_tokens)

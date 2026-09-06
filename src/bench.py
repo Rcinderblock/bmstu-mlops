@@ -7,14 +7,19 @@
 """
 
 import json
+import os
+import platform
 import resource
 import statistics
 import sys
 import time
 from pathlib import Path
 
+import torch
+import transformers
+
 from src.config import load_params
-from src.model import generate, load_model, set_seed
+from src.model import generate_tokens, load_model, prepare_inputs, set_seed
 
 
 def peak_rss_mb() -> float:
@@ -26,41 +31,83 @@ def peak_rss_mb() -> float:
     return peak / (1024 ** 2) if sys.platform == "darwin" else peak / 1024
 
 
-def main() -> None:
-    params = load_params()
+def synchronize(device) -> None:
+    """Дождаться ускорителя: его вычисления выполняются асинхронно."""
+    if device.type == "mps":
+        torch.mps.synchronize()
+    elif device.type == "cuda":
+        torch.cuda.synchronize(device)
+
+
+def run_benchmark(params: dict) -> dict:
+    """Раздельно измерить загрузку, генерацию после прогрева и пик RSS."""
+    warmup_runs = params["bench"]["warmup_runs"]
+    measure_runs = params["bench"]["measure_runs"]
+    if warmup_runs < 1 or measure_runs < 1:
+        raise ValueError("Нужны хотя бы один прогрев и одно измерение")
     set_seed(params["generate"]["seed"])
     prompt = params["bench"]["prompt"]
 
-    # TODO: разделить замеры. Сейчас в одном таймере и загрузка, и генерация.
     t0 = time.perf_counter()
     tokenizer, model = load_model(params)
+    synchronize(model.device)
+    load_time = time.perf_counter() - t0
 
-    # TODO: добавить прогрев перед измерением.
+    inputs = prepare_inputs(tokenizer, model, params, prompt)
+    for _ in range(warmup_runs):
+        generate_tokens(model, params, inputs)
+    synchronize(model.device)
+
     speeds = []
-    for _ in range(params["bench"]["measure_runs"]):
-        _, n_tokens = generate(tokenizer, model, params, prompt)
+    runs = []
+    for _ in range(measure_runs):
+        synchronize(model.device)
+        t0 = time.perf_counter()
+        new_tokens = generate_tokens(model, params, inputs)
+        synchronize(model.device)
         elapsed = time.perf_counter() - t0
+        n_tokens = len(new_tokens)
         speeds.append(n_tokens / elapsed)
-
-    load_time = 0.0
+        runs.append({"seconds": elapsed, "new_tokens": n_tokens})
 
     # Медиана устойчивее среднего к одиночному выбросу.
-    report = {
+    return {
         "model": params["model"]["name"],
         "device": str(model.device),
-        "dtype": params["model"]["dtype"],
-        "load_time_sec": round(load_time, 2),
-        "tokens_per_sec": round(statistics.median(speeds), 2),
-        "tokens_per_sec_all": [round(s, 2) for s in speeds],
+        "dtype": str(model.dtype),
+        "load_time_sec": round(load_time, 6),
+        "tokens_per_sec": round(statistics.median(speeds), 6),
+        "tokens_per_sec_all": [round(s, 6) for s in speeds],
         "peak_rss_mb": round(peak_rss_mb(), 1),
+        "warmup_runs": warmup_runs,
+        "measure_runs": measure_runs,
+        "runs": runs,
+        "prompt": prompt,
+        "max_new_tokens": params["generate"]["max_new_tokens"],
+        "seed": params["generate"]["seed"],
+        "temperature": params["generate"]["temperature"],
+        "enable_thinking": params["generate"]["enable_thinking"],
+        "model_revision": getattr(model.config, "_commit_hash", None),
+        "offline": os.environ.get("HF_HUB_OFFLINE") == "1",
+        "python": platform.python_version(),
+        "torch": torch.__version__,
+        "transformers": transformers.__version__,
     }
 
+
+def main() -> None:
+    report = run_benchmark(load_params())
     Path("docs").mkdir(exist_ok=True)
     Path("docs/bench.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    summary_keys = (
+        "model", "device", "dtype", "load_time_sec", "tokens_per_sec",
+        "peak_rss_mb", "warmup_runs", "measure_runs",
+    )
+    print(json.dumps({key: report[key] for key in summary_keys}, ensure_ascii=False, indent=2))
+    print("Подробности каждого прогона: docs/bench.json")
 
 
 if __name__ == "__main__":
