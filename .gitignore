@@ -1,0 +1,23 @@
+# Локальные материалы курса и пояснения для совместной работы
+/materials/
+/notes/
+/AGENTS.md
+
+# Установленные библиотеки и служебные файлы
+/.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+.env.*
+
+# Данные будут добавляться отдельно по требованиям следующих ДЗ
+/data/*
+!/data/.gitkeep
+
+# Временные результаты; итоговый отчёт docs/hardware.md сохраняется в Git
+docs/bench.json
+out1.txt
+out2.txt
+params.yaml.bak
+params.yaml.orig
