@@ -1,0 +1,28 @@
+bash tests/check_hw1.sh
+1. Имя модели не прописано в исходниках
+  ✓ имя берётся из params.yaml
+2. Смена модели через params.yaml
+  ✓ загружена именно модель из изменённого файла
+3. Два успешных запуска дают одинаковый непустой вывод
+  ✓ temperature=0; оба запуска успешны; выводы совпали
+4. Зависимости зафиксированы
+  ✓ прямые версии указаны; uv.lock соответствует проекту
+5. Отдельные таймеры, прогрев, медиана и единицы памяти
+test_measurement_is_required (test_bench.BenchmarkTests.test_measurement_is_required) ... ok
+test_rss_units_on_macos_and_linux (test_bench.BenchmarkTests.test_rss_units_on_macos_and_linux) ... ok
+test_timers_exclude_preparation_warmup_and_previous_runs (test_bench.BenchmarkTests.test_timers_exclude_preparation_warmup_and_previous_runs) ... ok
+test_waits_for_the_selected_accelerator (test_bench.BenchmarkTests.test_waits_for_the_selected_accelerator) ... ok
+test_warmup_is_required (test_bench.BenchmarkTests.test_warmup_is_required) ... ok
+test_hook_cleanup_after_failure_preserves_foreign_hook (test_inspect_model.AnatomyTests.test_hook_cleanup_after_failure_preserves_foreign_hook) ... ok
+test_lora_uses_actual_rectangular_dimensions (test_inspect_model.AnatomyTests.test_lora_uses_actual_rectangular_dimensions) ... ok
+test_metric_names_follow_device (test_inspect_model.AnatomyTests.test_metric_names_follow_device) ... ok
+test_peak_keeps_transient_allocation_and_stops_thread (test_inspect_model.AnatomyTests.test_peak_keeps_transient_allocation_and_stops_thread) ... ok
+test_shared_weights_have_one_owner (test_inspect_model.AnatomyTests.test_shared_weights_have_one_owner) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.007s
+
+OK
+  ✓ проверки измерений пройдены
+
+Все 5 пунктов пройдены. Отчёт: docs/hardware.md

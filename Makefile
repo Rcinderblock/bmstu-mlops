@@ -1,4 +1,4 @@
-.PHONY: install generate bench check test clean
+.PHONY: install generate bench inspect check check-hw1 test clean
 
 install:
 	uv sync --locked
@@ -8,6 +8,12 @@ generate:
 
 bench:
 	uv run --locked python -m src.bench
+
+inspect:
+	uv run --locked python -m src.inspect_model
+
+check-hw1:
+	bash tests/check_hw1.sh
 
 check:
 	bash tests/check.sh

@@ -1,0 +1,16 @@
+uv run --locked python -m unittest discover -s tests -p 'test_*.py' -v
+test_measurement_is_required (test_bench.BenchmarkTests.test_measurement_is_required) ... ok
+test_rss_units_on_macos_and_linux (test_bench.BenchmarkTests.test_rss_units_on_macos_and_linux) ... ok
+test_timers_exclude_preparation_warmup_and_previous_runs (test_bench.BenchmarkTests.test_timers_exclude_preparation_warmup_and_previous_runs) ... ok
+test_waits_for_the_selected_accelerator (test_bench.BenchmarkTests.test_waits_for_the_selected_accelerator) ... ok
+test_warmup_is_required (test_bench.BenchmarkTests.test_warmup_is_required) ... ok
+test_hook_cleanup_after_failure_preserves_foreign_hook (test_inspect_model.AnatomyTests.test_hook_cleanup_after_failure_preserves_foreign_hook) ... ok
+test_lora_uses_actual_rectangular_dimensions (test_inspect_model.AnatomyTests.test_lora_uses_actual_rectangular_dimensions) ... ok
+test_metric_names_follow_device (test_inspect_model.AnatomyTests.test_metric_names_follow_device) ... ok
+test_peak_keeps_transient_allocation_and_stops_thread (test_inspect_model.AnatomyTests.test_peak_keeps_transient_allocation_and_stops_thread) ... ok
+test_shared_weights_have_one_owner (test_inspect_model.AnatomyTests.test_shared_weights_have_one_owner) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.006s
+
+OK

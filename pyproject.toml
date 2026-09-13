@@ -1,7 +1,7 @@
 [project]
-name = "mlops-hw1"
+name = "bmstu-mlops"
 version = "0.1.0"
-description = "MLOPS-26, домашняя работа 1: окружение и бенчмарк"
+description = "MLOPS-26: воспроизводимые запуски и анатомия языковой модели"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "torch==2.14.0",
@@ -10,4 +10,6 @@ dependencies = [
     "numpy==2.5.3",
     "pyyaml==6.0.3",
     "psutil==7.2.2",
+    "peft==0.20.0",
+    "matplotlib==3.11.2",
 ]
