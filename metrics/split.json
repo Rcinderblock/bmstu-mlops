@@ -1,0 +1,56 @@
+{
+  "version": "v1",
+  "seed": 42,
+  "group_key": "topic",
+  "groups_total": 2347,
+  "sizes": {
+    "train": 1925,
+    "val": 256,
+    "test": 260
+  },
+  "groups": {
+    "train": 1863,
+    "val": 243,
+    "test": 241
+  },
+  "ratios_actual": {
+    "train": 0.7886,
+    "val": 0.1049,
+    "test": 0.1065
+  },
+  "labels": {
+    "train": {
+      "alarm_query": 97,
+      "alarm_remove": 59,
+      "alarm_set": 115,
+      "calendar_query": 421,
+      "calendar_remove": 225,
+      "calendar_set": 635,
+      "lists_createoradd": 117,
+      "lists_query": 141,
+      "lists_remove": 115
+    },
+    "val": {
+      "alarm_query": 13,
+      "alarm_remove": 4,
+      "alarm_set": 20,
+      "calendar_query": 62,
+      "calendar_remove": 31,
+      "calendar_set": 70,
+      "lists_createoradd": 17,
+      "lists_query": 20,
+      "lists_remove": 19
+    },
+    "test": {
+      "alarm_query": 9,
+      "alarm_remove": 5,
+      "alarm_set": 34,
+      "calendar_query": 67,
+      "calendar_remove": 28,
+      "calendar_set": 67,
+      "lists_createoradd": 19,
+      "lists_query": 18,
+      "lists_remove": 13
+    }
+  }
+}

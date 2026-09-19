@@ -1,0 +1,344 @@
+schema: '2.0'
+stages:
+  collect:
+    cmd: uv run --locked python -m src.collect
+    deps:
+    - path: conf/source.json
+      hash: md5
+      md5: a5a40ed798312348d8ccd11fb461e4f1
+      size: 496
+    - path: data/source
+      hash: md5
+      md5: 96946622e855887e9bc9e6faeec0909f.dir
+      size: 13048462
+      nfiles: 2
+    - path: src/collect.py
+      hash: md5
+      md5: e794f25faad65df86b91f8a2a8a6e1be
+      size: 5062
+    - path: src/config.py
+      hash: md5
+      md5: d1af94455f9641952ff6c34f46ac6060
+      size: 336
+    - path: src/schema.py
+      hash: md5
+      md5: d6b1879d94b21692a2f4ba7a2dd631d6
+      size: 3140
+    - path: src/textnorm.py
+      hash: md5
+      md5: c7e2f072fe9cc4d2b5af76f5c360c6c0
+      size: 1844
+    - path: uv.lock
+      hash: md5
+      md5: ee23876fca1bd302b971d055ce78b14e
+      size: 231169
+    params:
+      params.yaml:
+        collect:
+          version: v1
+          source_manifest: conf/source.json
+          sources:
+            v1:
+            - data/source/massive-ru-RU.jsonl
+            v2:
+            - data/source/massive-ru-RU.jsonl
+          partitions:
+            v1:
+            - train
+            v2:
+            - train
+            - dev
+            - test
+          locale: ru-RU
+          scenarios:
+          - calendar
+          - lists
+          - alarm
+          min_intent_votes: 2
+          exclude_user_pattern: (?i)таймер
+          labels:
+            alarm_set: поставить будильник
+            alarm_query: посмотреть будильники
+            alarm_remove: удалить будильник
+            calendar_set: создать событие или напоминание
+            calendar_query: посмотреть календарь
+            calendar_remove: удалить событие
+            lists_createoradd: создать список или добавить пункт
+            lists_query: посмотреть список
+            lists_remove: удалить список или пункт
+          system_prompts:
+          - Определи действие для личного планировщика. Верни только одну метку
+            из списка без пояснений.
+          - Разбери русскую команду о календаре списках или будильнике. Ответь
+            только подходящей меткой.
+          - Выбери намерение пользователя из разрешённых меток. Не выполняй
+            команду и не добавляй объяснений.
+          - Ты классифицируешь запросы к планировщику. Выведи одну метку
+            действия без дополнительного текста.
+        paths.metrics_collect: metrics/collect.json
+        paths.raw: data/raw.jsonl
+    outs:
+    - path: data/raw.jsonl
+      hash: md5
+      md5: 5620469e1283a74b9edad3bd47cb1efe
+      size: 2514368
+    - path: metrics/collect.json
+      hash: md5
+      md5: c3914c0bb62dacd411549872d6a77bcc
+      size: 599
+  clean:
+    cmd: uv run --locked python -m src.clean
+    deps:
+    - path: data/raw.jsonl
+      hash: md5
+      md5: 5620469e1283a74b9edad3bd47cb1efe
+      size: 2514368
+    - path: src/clean.py
+      hash: md5
+      md5: 7b1ece94d8a728b85ea4482ccb174a1e
+      size: 4564
+    - path: src/config.py
+      hash: md5
+      md5: d1af94455f9641952ff6c34f46ac6060
+      size: 336
+    - path: src/dedup.py
+      hash: md5
+      md5: 376503758eb68297517b6dce52d77186
+      size: 3187
+    - path: src/pii.py
+      hash: md5
+      md5: a60dc5c32d6f63e48f570c7014a89666
+      size: 1699
+    - path: src/schema.py
+      hash: md5
+      md5: d6b1879d94b21692a2f4ba7a2dd631d6
+      size: 3140
+    - path: src/stats.py
+      hash: md5
+      md5: a54925032eff4769647b5775d72dd423
+      size: 2222
+    - path: src/textnorm.py
+      hash: md5
+      md5: c7e2f072fe9cc4d2b5af76f5c360c6c0
+      size: 1844
+    - path: uv.lock
+      hash: md5
+      md5: ee23876fca1bd302b971d055ce78b14e
+      size: 231169
+    params:
+      params.yaml:
+        clean:
+          min_user_chars: 5
+          max_user_chars: 500
+          min_assistant_chars: 2
+          near_dup:
+            enabled: true
+            shingle_words: 4
+            num_perm: 64
+            threshold: 0.85
+          pii:
+            enabled: true
+        collect.version: v1
+        contamination:
+          threshold: 0.85
+        paths.clean: data/clean.jsonl
+        paths.metrics_clean: metrics/clean.json
+        paths.raw: data/raw.jsonl
+    outs:
+    - path: data/clean.jsonl
+      hash: md5
+      md5: 8c49e3889b92661bd3c138b8fa2c3c95
+      size: 2449064
+    - path: metrics/clean.json
+      hash: md5
+      md5: 75cebcc69e0eb06ffa101c90b73dc9ad
+      size: 422
+  diversity:
+    cmd: uv run --locked python -m src.diversity
+    deps:
+    - path: data/clean.jsonl
+      hash: md5
+      md5: 8c49e3889b92661bd3c138b8fa2c3c95
+      size: 2449064
+    - path: src/config.py
+      hash: md5
+      md5: d1af94455f9641952ff6c34f46ac6060
+      size: 336
+    - path: src/diversity.py
+      hash: md5
+      md5: aa2a0f5ff92cbde5e387cfb9b10caf78
+      size: 7294
+    - path: src/schema.py
+      hash: md5
+      md5: d6b1879d94b21692a2f4ba7a2dd631d6
+      size: 3140
+    - path: src/stats.py
+      hash: md5
+      md5: a54925032eff4769647b5775d72dd423
+      size: 2222
+    - path: src/textnorm.py
+      hash: md5
+      md5: c7e2f072fe9cc4d2b5af76f5c360c6c0
+      size: 1844
+    - path: uv.lock
+      hash: md5
+      md5: ee23876fca1bd302b971d055ce78b14e
+      size: 231169
+    params:
+      params.yaml:
+        collect.version: v1
+        diversity:
+          min_examples: 1000
+          min_system_prompts: 3
+          min_groups: 50
+          max_group_share: 0.1
+          min_answer_len_ratio: 1.0
+          max_same_length_share: 1.0
+          max_duplicate_answer_share: 1.0
+          min_labels: 9
+          max_label_share: 0.4
+          min_user_len_ratio: 2.0
+          min_unique_user_share: 1.0
+        paths.clean: data/clean.jsonl
+        paths.metrics_diversity: metrics/diversity.json
+        split.group_key: topic
+    outs:
+    - path: metrics/diversity.json
+      hash: md5
+      md5: a06985185a06fa2ab7c6f0e7ed986522
+      size: 983
+  split:
+    cmd: uv run --locked python -m src.split
+    deps:
+    - path: data/clean.jsonl
+      hash: md5
+      md5: 8c49e3889b92661bd3c138b8fa2c3c95
+      size: 2449064
+    - path: metrics/diversity.json
+      hash: md5
+      md5: a06985185a06fa2ab7c6f0e7ed986522
+      size: 983
+    - path: src/config.py
+      hash: md5
+      md5: d1af94455f9641952ff6c34f46ac6060
+      size: 336
+    - path: src/schema.py
+      hash: md5
+      md5: d6b1879d94b21692a2f4ba7a2dd631d6
+      size: 3140
+    - path: src/split.py
+      hash: md5
+      md5: 8999250af3e9601f622cd0a6e8ad4072
+      size: 2491
+    - path: src/textnorm.py
+      hash: md5
+      md5: c7e2f072fe9cc4d2b5af76f5c360c6c0
+      size: 1844
+    - path: uv.lock
+      hash: md5
+      md5: ee23876fca1bd302b971d055ce78b14e
+      size: 231169
+    params:
+      params.yaml:
+        collect.labels:
+          alarm_set: поставить будильник
+          alarm_query: посмотреть будильники
+          alarm_remove: удалить будильник
+          calendar_set: создать событие или напоминание
+          calendar_query: посмотреть календарь
+          calendar_remove: удалить событие
+          lists_createoradd: создать список или добавить пункт
+          lists_query: посмотреть список
+          lists_remove: удалить список или пункт
+        collect.version: v1
+        paths.clean: data/clean.jsonl
+        paths.metrics_split: metrics/split.json
+        paths.test: data/test.jsonl
+        paths.train: data/train.jsonl
+        paths.val: data/val.jsonl
+        split:
+          group_key: topic
+          ratios:
+            train: 0.8
+            val: 0.1
+            test: 0.1
+          seed: 42
+    outs:
+    - path: data/test.jsonl
+      hash: md5
+      md5: 31b2d0384b8f9a7377b5dd7aaf616b64
+      size: 260485
+    - path: data/train.jsonl
+      hash: md5
+      md5: 0ebe1476141469750d65fd0e37428595
+      size: 1931568
+    - path: data/val.jsonl
+      hash: md5
+      md5: 9242abe7fd66fbe79ec5ee79b66929e4
+      size: 257011
+    - path: metrics/split.json
+      hash: md5
+      md5: bdce4867829cf2228a4d4f93cd5e6ad4
+      size: 1107
+  contamination:
+    cmd: uv run --locked python scripts/check_contamination.py
+    deps:
+    - path: data/test.jsonl
+      hash: md5
+      md5: 31b2d0384b8f9a7377b5dd7aaf616b64
+      size: 260485
+    - path: data/train.jsonl
+      hash: md5
+      md5: 0ebe1476141469750d65fd0e37428595
+      size: 1931568
+    - path: data/val.jsonl
+      hash: md5
+      md5: 9242abe7fd66fbe79ec5ee79b66929e4
+      size: 257011
+    - path: scripts/check_contamination.py
+      hash: md5
+      md5: 8bc0517492de9fe44451dce4e79d3f1a
+      size: 1548
+    - path: src/config.py
+      hash: md5
+      md5: d1af94455f9641952ff6c34f46ac6060
+      size: 336
+    - path: src/contamination.py
+      hash: md5
+      md5: 6150ffb2fa2c11a173716de9fc41204f
+      size: 1869
+    - path: src/dedup.py
+      hash: md5
+      md5: 376503758eb68297517b6dce52d77186
+      size: 3187
+    - path: src/schema.py
+      hash: md5
+      md5: d6b1879d94b21692a2f4ba7a2dd631d6
+      size: 3140
+    - path: src/textnorm.py
+      hash: md5
+      md5: c7e2f072fe9cc4d2b5af76f5c360c6c0
+      size: 1844
+    - path: uv.lock
+      hash: md5
+      md5: ee23876fca1bd302b971d055ce78b14e
+      size: 231169
+    params:
+      params.yaml:
+        clean.near_dup:
+          enabled: true
+          shingle_words: 4
+          num_perm: 64
+          threshold: 0.85
+        collect.version: v1
+        contamination:
+          threshold: 0.85
+        paths.metrics_contamination: metrics/contamination.json
+        paths.test: data/test.jsonl
+        paths.train: data/train.jsonl
+        paths.val: data/val.jsonl
+    outs:
+    - path: metrics/contamination.json
+      hash: md5
+      md5: 24814d214fd1f505474ddb6b3d197695
+      size: 456

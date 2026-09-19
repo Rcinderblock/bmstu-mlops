@@ -1,0 +1,79 @@
+stages:
+  collect:
+    cmd: uv run --locked python -m src.collect
+    deps:
+      - src/collect.py
+      - src/config.py
+      - src/schema.py
+      - src/textnorm.py
+      - conf/source.json
+      - data/source
+      - uv.lock
+    params: [collect, paths.raw, paths.metrics_collect]
+    outs: [data/raw.jsonl]
+    metrics:
+      - metrics/collect.json:
+          cache: false
+  clean:
+    cmd: uv run --locked python -m src.clean
+    deps:
+      - data/raw.jsonl
+      - src/clean.py
+      - src/config.py
+      - src/schema.py
+      - src/dedup.py
+      - src/textnorm.py
+      - src/pii.py
+      - src/stats.py
+      - uv.lock
+    params: [collect.version, clean, contamination, paths.raw, paths.clean, paths.metrics_clean]
+    outs: [data/clean.jsonl]
+    metrics:
+      - metrics/clean.json:
+          cache: false
+  diversity:
+    cmd: uv run --locked python -m src.diversity
+    deps:
+      - data/clean.jsonl
+      - src/diversity.py
+      - src/config.py
+      - src/schema.py
+      - src/textnorm.py
+      - src/stats.py
+      - uv.lock
+    params: [collect.version, diversity, split.group_key, paths.clean, paths.metrics_diversity]
+    metrics:
+      - metrics/diversity.json:
+          cache: false
+  split:
+    cmd: uv run --locked python -m src.split
+    deps:
+      - data/clean.jsonl
+      - metrics/diversity.json
+      - src/split.py
+      - src/config.py
+      - src/schema.py
+      - src/textnorm.py
+      - uv.lock
+    params: [collect.version, collect.labels, split, paths.clean, paths.train, paths.val, paths.test, paths.metrics_split]
+    outs: [data/train.jsonl, data/val.jsonl, data/test.jsonl]
+    metrics:
+      - metrics/split.json:
+          cache: false
+  contamination:
+    cmd: uv run --locked python scripts/check_contamination.py
+    deps:
+      - data/train.jsonl
+      - data/val.jsonl
+      - data/test.jsonl
+      - scripts/check_contamination.py
+      - src/contamination.py
+      - src/config.py
+      - src/schema.py
+      - src/dedup.py
+      - src/textnorm.py
+      - uv.lock
+    params: [collect.version, clean.near_dup, contamination, paths.train, paths.val, paths.test, paths.metrics_contamination]
+    metrics:
+      - metrics/contamination.json:
+          cache: false

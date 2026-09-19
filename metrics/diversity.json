@@ -1,0 +1,46 @@
+{
+  "version": "v1",
+  "examples": 2441,
+  "labels": 9,
+  "largest_label_share": 0.3163,
+  "user_len": {
+    "p10": 22,
+    "p50": 40,
+    "p90": 67,
+    "ratio_p90_p10": 3.05,
+    "cv": 0.433,
+    "min": 5,
+    "max": 148
+  },
+  "unique_user_share": 1.0,
+  "system_prompts": 4,
+  "groups": 2347,
+  "largest_group": "planner-template-cfd7310ff48c5d5634ce",
+  "largest_group_share": 0.0033,
+  "answer_len": {
+    "p10": 11,
+    "p50": 12,
+    "p90": 15,
+    "ratio_p90_p10": 1.36,
+    "cv": 0.149,
+    "min": 9,
+    "max": 17
+  },
+  "same_length_share": 0.4043,
+  "duplicate_answer_share": 0.9963,
+  "thresholds": {
+    "min_examples": 1000,
+    "min_system_prompts": 3,
+    "min_groups": 50,
+    "max_group_share": 0.1,
+    "min_answer_len_ratio": 1.0,
+    "max_same_length_share": 1.0,
+    "max_duplicate_answer_share": 1.0,
+    "min_labels": 9,
+    "max_label_share": 0.4,
+    "min_user_len_ratio": 2.0,
+    "min_unique_user_share": 1.0
+  },
+  "violations": [],
+  "passed": true
+}

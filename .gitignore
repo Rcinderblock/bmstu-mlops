@@ -12,8 +12,7 @@ __pycache__/
 .env.*
 
 # Данные будут добавляться отдельно по требованиям следующих ДЗ
-/data/*
-!/data/.gitkeep
+data/
 
 # Временные результаты; итоговый отчёт docs/hardware.md сохраняется в Git
 docs/bench.json
@@ -21,3 +20,7 @@ out1.txt
 out2.txt
 params.yaml.bak
 params.yaml.orig
+
+/.dvc/cache/
+/.dvc/tmp/
+/.dvc/config.local

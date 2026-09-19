@@ -47,3 +47,81 @@ lora:
 report:
   json: "docs/report.json"
   markdown: "docs/anatomy.md"
+
+# Данные: русские команды личного планировщика.
+collect:
+  version: "v1"
+  source_manifest: "conf/source.json"
+  sources:
+    v1:
+      - "data/source/massive-ru-RU.jsonl"
+    v2:
+      - "data/source/massive-ru-RU.jsonl"
+  partitions:
+    v1: [train]
+    v2: [train, dev, test]
+  locale: "ru-RU"
+  scenarios: [calendar, lists, alarm]
+  min_intent_votes: 2
+  exclude_user_pattern: "(?i)таймер"
+  labels:
+    alarm_set: "поставить будильник"
+    alarm_query: "посмотреть будильники"
+    alarm_remove: "удалить будильник"
+    calendar_set: "создать событие или напоминание"
+    calendar_query: "посмотреть календарь"
+    calendar_remove: "удалить событие"
+    lists_createoradd: "создать список или добавить пункт"
+    lists_query: "посмотреть список"
+    lists_remove: "удалить список или пункт"
+  system_prompts:
+    - "Определи действие для личного планировщика. Верни только одну метку из списка без пояснений."
+    - "Разбери русскую команду о календаре списках или будильнике. Ответь только подходящей меткой."
+    - "Выбери намерение пользователя из разрешённых меток. Не выполняй команду и не добавляй объяснений."
+    - "Ты классифицируешь запросы к планировщику. Выведи одну метку действия без дополнительного текста."
+clean:
+  min_user_chars: 5
+  max_user_chars: 500
+  min_assistant_chars: 2
+  near_dup:
+    enabled: true
+    shingle_words: 4
+    num_perm: 64
+    threshold: 0.85
+  pii:
+    enabled: true
+
+diversity:
+  min_examples: 1000
+  min_system_prompts: 3
+  min_groups: 50
+  max_group_share: 0.10
+  # Ответ — одна из 9 фиксированных меток, разнообразие оцениваем по запросам.
+  min_answer_len_ratio: 1.0
+  max_same_length_share: 1.0
+  max_duplicate_answer_share: 1.0
+  min_labels: 9
+  max_label_share: 0.40
+  min_user_len_ratio: 2.0
+  min_unique_user_share: 1.0
+
+split:
+  group_key: "topic"
+  ratios:
+    train: 0.8
+    val: 0.1
+    test: 0.1
+  seed: 42
+contamination:
+  threshold: 0.85
+paths:
+  raw: "data/raw.jsonl"
+  clean: "data/clean.jsonl"
+  train: "data/train.jsonl"
+  val: "data/val.jsonl"
+  test: "data/test.jsonl"
+  metrics_collect: "metrics/collect.json"
+  metrics_clean: "metrics/clean.json"
+  metrics_diversity: "metrics/diversity.json"
+  metrics_split: "metrics/split.json"
+  metrics_contamination: "metrics/contamination.json"

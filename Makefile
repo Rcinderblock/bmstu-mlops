@@ -1,4 +1,4 @@
-.PHONY: install generate bench inspect check check-hw1 test clean
+.PHONY: install generate bench inspect check check-hw1 check-hw2 data fetch-data diff test clean
 
 install:
 	uv sync --locked
@@ -23,3 +23,15 @@ test:
 
 clean:
 	rm -rf docs/bench.json out1.txt out2.txt params.yaml.bak
+
+check-hw2:
+	bash tests/check_hw2.sh
+
+fetch-data:
+	uv run --locked python scripts/fetch_source.py
+
+data:
+	uv run --locked dvc repro
+
+diff:
+	uv run --locked dvc metrics diff hw03-v1 hw03-v2
