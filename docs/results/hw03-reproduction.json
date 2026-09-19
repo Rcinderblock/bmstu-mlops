@@ -1,0 +1,17 @@
+{
+  "method": "fresh local clone, dvc pull, dvc repro --force; locked shared Python environment",
+  "data_sha256_equal": {
+    "data/raw.jsonl": true,
+    "data/clean.jsonl": true,
+    "data/train.jsonl": true,
+    "data/val.jsonl": true,
+    "data/test.jsonl": true
+  },
+  "metrics_equal": {
+    "diversity.json": true,
+    "contamination.json": true,
+    "collect.json": true,
+    "split.json": true,
+    "clean.json": true
+  }
+}
