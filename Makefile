@@ -34,4 +34,4 @@ data:
 	uv run --locked dvc repro
 
 diff:
-	uv run --locked dvc metrics diff hw03-v1 hw03-v2
+	uv run --locked dvc metrics diff hw03-v1 hw03-v2 --targets metrics/clean.json

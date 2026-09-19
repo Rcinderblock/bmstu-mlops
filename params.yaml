@@ -50,7 +50,7 @@ report:
 
 # Данные: русские команды личного планировщика.
 collect:
-  version: "v1"
+  version: "v2"
   source_manifest: "conf/source.json"
   sources:
     v1:
