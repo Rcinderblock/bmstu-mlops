@@ -1,0 +1,21 @@
+{
+  "method": "Файлы индекса Git выгружены в отдельную папку. Данные восстановлены dvc pull из локального хранилища. dvc repro --single-item --force tokenize выполнен заново. Использовано то же зафиксированное окружение и кэш токенизатора.",
+  "outputs": {
+    "metrics/tokenize.json": {
+      "sha256": "22b4dce00fe8d22947839f85e1a0b5a00bd87dd9b210f4270a90c29895946a93",
+      "matches": true
+    },
+    "docs/tokenize_report.md": {
+      "sha256": "05d7f6abae03f1ba395872664b2b2bc058bd53ae2071a819fcd13ba39ea137c3",
+      "matches": true
+    },
+    "data/tokenized/train.pt": {
+      "sha256": "e00aade6f48ea6358d05e461515a5075f218287f2f114ff99bb175995dd269a9",
+      "matches": true
+    },
+    "data/tokenized/val.pt": {
+      "sha256": "bc4b3ddb41e8053b0c367d05294c42f183333dd50a3b8f8727dee061d24c6ef7",
+      "matches": true
+    }
+  }
+}

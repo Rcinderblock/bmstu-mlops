@@ -6,6 +6,8 @@ import numpy as np
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+from src.prompt import build_chat_text
+
 
 def set_seed(seed: int) -> None:
     """Зафиксировать источники случайности, чтобы прогон воспроизводился."""
@@ -18,6 +20,7 @@ def load_model(params: dict):
     """Загрузить токенизатор и модель по имени из конфига."""
     name = params["model"]["name"]
     tokenizer = AutoTokenizer.from_pretrained(name)
+    tokenizer.padding_side = params["tokenize"]["padding_side"]
     model = AutoModelForCausalLM.from_pretrained(
         name,
         dtype=getattr(torch, params["model"]["dtype"]),
@@ -34,14 +37,7 @@ def build_prompt(tokenizer, params: dict, text: str) -> str:
     а расхождение шаблонов обучения и инференса — самая частая тихая ошибка.
     """
     messages = [{"role": "user", "content": text}]
-    kwargs = {}
-    # Параметр есть только у моделей с режимом рассуждений (Qwen3);
-    # остальные шаблоны его молча проигнорируют.
-    if params["generate"].get("enable_thinking") is not None:
-        kwargs["enable_thinking"] = params["generate"]["enable_thinking"]
-    return tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True, **kwargs
-    )
+    return build_chat_text(tokenizer, messages, params, add_generation_prompt=True)
 
 
 def prepare_inputs(tokenizer, model, params: dict, text: str):

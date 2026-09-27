@@ -4,12 +4,12 @@ model:
   name: "Qwen/Qwen3-0.6B"
   dtype: "bfloat16"
   device: "auto"            # auto | cpu | cuda | mps
+  enable_thinking: false    # один режим шаблона для подготовки данных и генерации
 
 generate:
   max_new_tokens: 200
   temperature: 0.0          # выбираем наиболее вероятный токен без случайного выбора
   seed: 42
-  enable_thinking: false    # Qwen3 без этого отвечает <think>-блоком
 
 bench:
   warmup_runs: 1            # прогрев не засчитывается в замер
@@ -125,3 +125,21 @@ paths:
   metrics_diversity: "metrics/diversity.json"
   metrics_split: "metrics/split.json"
   metrics_contamination: "metrics/contamination.json"
+
+# Подготовка числовых последовательностей; веса модели не загружаются.
+data:
+  train_jsonl: "data/train.jsonl"
+  val_jsonl: "data/val.jsonl"
+  out_dir: "data/tokenized"
+tokenize:
+  max_seq_len: 224  # наблюдаемый максимум 193; запас до следующего кратного 32
+  truncated_warn_ratio: 0.05
+  padding_side: "left"
+  batch_size: 8
+packing:
+  enabled: false
+train_estimate:
+  epochs: 3
+  generation_benchmark: "docs/results/hw01-bench.json"
+  slowdown_min: 2
+  slowdown_max: 3

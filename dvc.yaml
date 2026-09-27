@@ -1,4 +1,24 @@
 stages:
+  tokenize:
+    cmd: uv run --locked python -m src.tokenize_data
+    deps:
+      - data/train.jsonl
+      - data/val.jsonl
+      - metrics/contamination.json
+      - src/tokenize_data.py
+      - src/prompt.py
+      - src/collate.py
+      - src/config.py
+      - docs/results/hw01-bench.json
+      - uv.lock
+    params: [model, tokenize, packing, train_estimate, data]
+    outs:
+      - data/tokenized
+      - docs/tokenize_report.md:
+          cache: false
+    metrics:
+      - metrics/tokenize.json:
+          cache: false
   collect:
     cmd: uv run --locked python -m src.collect
     deps:

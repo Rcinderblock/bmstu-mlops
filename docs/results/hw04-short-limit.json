@@ -1,0 +1,129 @@
+{
+  "max_seq_len": 160,
+  "threshold": 0.05,
+  "note": "Диагностический прогон. Основные params.yaml и data/tokenized не менялись.",
+  "splits": {
+    "train": {
+      "examples_in": 2743,
+      "examples_kept": 2429,
+      "dropped_no_supervision": 314,
+      "length_tokens": {
+        "count": 2743,
+        "mean": 155.32,
+        "p50": 154,
+        "p90": 164,
+        "p99": 175,
+        "max": 193
+      },
+      "prompt_tokens": {
+        "count": 2743,
+        "mean": 151.2,
+        "p50": 150,
+        "p90": 160,
+        "p99": 171,
+        "max": 189
+      },
+      "answer_tokens": {
+        "count": 2743,
+        "mean": 3.12,
+        "p50": 3,
+        "p90": 3,
+        "p99": 5,
+        "max": 5
+      },
+      "bpe_boundary_fallback": 0,
+      "template_prefix_matches": 2743,
+      "total_tokens": 372660,
+      "supervised_tokens": 7377,
+      "truncated": 552,
+      "truncated_ratio": 0.2012395187750638,
+      "truncation_pass": false,
+      "padding": {
+        "batch_size": 8,
+        "batches": 304,
+        "dynamic_slots": 385832,
+        "dynamic_pad_tokens": 13172,
+        "dynamic_pad_ratio": 0.03413921084824483,
+        "static_slots": 388640,
+        "static_pad_ratio": 0.0411177439275422,
+        "first_batch_shape": [
+          8,
+          160
+        ],
+        "first_batch_lengths": [
+          155,
+          150,
+          160,
+          154,
+          150,
+          156,
+          148,
+          146
+        ],
+        "padding_label_errors": 0
+      },
+      "supervised_ratio": 0.019795524070198037
+    },
+    "val": {
+      "examples_in": 352,
+      "examples_kept": 303,
+      "dropped_no_supervision": 49,
+      "length_tokens": {
+        "count": 352,
+        "mean": 155.47,
+        "p50": 154,
+        "p90": 164,
+        "p99": 173,
+        "max": 185
+      },
+      "prompt_tokens": {
+        "count": 352,
+        "mean": 151.34,
+        "p50": 150,
+        "p90": 160,
+        "p99": 169,
+        "max": 179
+      },
+      "answer_tokens": {
+        "count": 352,
+        "mean": 3.12,
+        "p50": 3,
+        "p90": 3,
+        "p99": 5,
+        "max": 5
+      },
+      "bpe_boundary_fallback": 0,
+      "template_prefix_matches": 352,
+      "total_tokens": 46465,
+      "supervised_tokens": 935,
+      "truncated": 75,
+      "truncated_ratio": 0.21306818181818182,
+      "truncation_pass": false,
+      "padding": {
+        "batch_size": 8,
+        "batches": 38,
+        "dynamic_slots": 48168,
+        "dynamic_pad_tokens": 1703,
+        "dynamic_pad_ratio": 0.03535542268726125,
+        "static_slots": 48480,
+        "static_pad_ratio": 0.04156353135313531,
+        "first_batch_shape": [
+          8,
+          158
+        ],
+        "first_batch_lengths": [
+          156,
+          150,
+          151,
+          148,
+          150,
+          158,
+          154,
+          151
+        ],
+        "padding_label_errors": 0
+      },
+      "supervised_ratio": 0.02012267297966211
+    }
+  }
+}

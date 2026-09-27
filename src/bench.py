@@ -86,7 +86,7 @@ def run_benchmark(params: dict) -> dict:
         "max_new_tokens": params["generate"]["max_new_tokens"],
         "seed": params["generate"]["seed"],
         "temperature": params["generate"]["temperature"],
-        "enable_thinking": params["generate"]["enable_thinking"],
+        "enable_thinking": params["model"]["enable_thinking"],
         "model_revision": getattr(model.config, "_commit_hash", None),
         "offline": os.environ.get("HF_HUB_OFFLINE") == "1",
         "python": platform.python_version(),

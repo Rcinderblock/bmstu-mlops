@@ -1,0 +1,23 @@
+{
+  "train": {
+    "examples": 2743,
+    "input_tokens": 415065,
+    "loss_tokens": 415065,
+    "prefix_matches": 0,
+    "truncated": 0
+  },
+  "val": {
+    "examples": 352,
+    "input_tokens": 53317,
+    "loss_tokens": 53317,
+    "prefix_matches": 0,
+    "truncated": 0
+  },
+  "padding_side": "right",
+  "method": "Исходные модули преподавателя выполнены отдельно на текущих train/val. max_seq_len=232. Основной проект не изменялся.",
+  "source_sha256": {
+    "prompt.py": "e9a029c01a1dfd2618a15ccba807704f46b864d2e4b3bdf2caf5e2e98340b352",
+    "tokenize_data.py": "e2ce3192e8d23e2ee5301846b0fe3cd6cb38708761ac3b53e604a9e0d7f4ff04",
+    "collate.py": "21e5083d49646392b81ae7a5cfd29f5c5185cab50d1f3902223784d9354e5d94"
+  }
+}

@@ -342,3 +342,79 @@ stages:
       hash: md5
       md5: 097054a6e5253636195fa4a15f69e7b5
       size: 456
+  tokenize:
+    cmd: uv run --locked python -m src.tokenize_data
+    deps:
+    - path: data/train.jsonl
+      hash: md5
+      md5: ce4f6d877f5f95fc8a3d47ed4182586d
+      size: 2750778
+    - path: data/val.jsonl
+      hash: md5
+      md5: 3d36516fd88d9909f3bedfcc01d58def
+      size: 353626
+    - path: docs/results/hw01-bench.json
+      hash: md5
+      md5: df7005466389817ac65779495584fbac
+      size: 855
+    - path: metrics/contamination.json
+      hash: md5
+      md5: 097054a6e5253636195fa4a15f69e7b5
+      size: 456
+    - path: src/collate.py
+      hash: md5
+      md5: 6343d46a9b501f3a86bd0dd862db5c71
+      size: 1940
+    - path: src/config.py
+      hash: md5
+      md5: d1af94455f9641952ff6c34f46ac6060
+      size: 336
+    - path: src/prompt.py
+      hash: md5
+      md5: 854d67d2effab1022a93906c9f397312
+      size: 4737
+    - path: src/tokenize_data.py
+      hash: md5
+      md5: abef916ec7eb8b55a6e5a0289827cf56
+      size: 15789
+    - path: uv.lock
+      hash: md5
+      md5: ee23876fca1bd302b971d055ce78b14e
+      size: 231169
+    params:
+      params.yaml:
+        data:
+          train_jsonl: data/train.jsonl
+          val_jsonl: data/val.jsonl
+          out_dir: data/tokenized
+        model:
+          name: Qwen/Qwen3-0.6B
+          dtype: bfloat16
+          device: auto
+          enable_thinking: false
+        packing:
+          enabled: false
+        tokenize:
+          max_seq_len: 224
+          truncated_warn_ratio: 0.05
+          padding_side: left
+          batch_size: 8
+        train_estimate:
+          epochs: 3
+          generation_benchmark: docs/results/hw01-bench.json
+          slowdown_min: 2
+          slowdown_max: 3
+    outs:
+    - path: data/tokenized
+      hash: md5
+      md5: 99de1adb164f87ff6021b0f53951afb8.dir
+      size: 5201078
+      nfiles: 2
+    - path: docs/tokenize_report.md
+      hash: md5
+      md5: 45b73ee7af3355262914e497ffc85ff2
+      size: 4553
+    - path: metrics/tokenize.json
+      hash: md5
+      md5: f1bdf6dfebddeec112cea75748cf066f
+      size: 3900

@@ -1,4 +1,4 @@
-.PHONY: install generate bench inspect check check-hw1 check-hw2 data fetch-data diff test clean
+.PHONY: tokenize check-hw3 install generate bench inspect check check-hw1 check-hw2 data fetch-data diff test clean
 
 install:
 	uv sync --locked
@@ -17,6 +17,12 @@ check-hw1:
 
 check:
 	bash tests/check.sh
+
+check-hw3:
+	bash tests/check_hw3.sh
+
+tokenize:
+	uv run --locked dvc repro tokenize
 
 test:
 	uv run --locked python -m unittest discover -s tests -p 'test_*.py' -v
