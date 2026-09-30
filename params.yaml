@@ -1,84 +1,100 @@
-# Единственное место, где живёт имя модели.
-# Менять модель под своё железо нужно ЗДЕСЬ, а не в коде.
 model:
-  name: "Qwen/Qwen3-0.6B"
-  dtype: "bfloat16"
-  device: "auto"            # auto | cpu | cuda | mps
-  enable_thinking: false    # один режим шаблона для подготовки данных и генерации
-
+  name: Qwen/Qwen3-0.6B
+  dtype: bfloat16
+  device: auto
+  enable_thinking: false
 generate:
   max_new_tokens: 200
-  temperature: 0.0          # выбираем наиболее вероятный токен без случайного выбора
+  temperature: 0.0
   seed: 42
-
 bench:
-  warmup_runs: 1            # прогрев не засчитывается в замер
+  warmup_runs: 1
   measure_runs: 3
-  prompt: "Объясни, что такое MLOps, в трёх предложениях."
-
+  prompt: Объясни, что такое MLOps, в трёх предложениях.
 hooks:
-  prompt: "Объясни, что такое MLOps, в трёх предложениях."
-  plot: "docs/activations.png"
-
+  prompt: Объясни, что такое MLOps, в трёх предложениях.
+  plot: docs/activations.png
 memory:
-  # Один шаг forward+backward+optimizer на короткой последовательности.
   seq_len: 256
   batch_size: 1
-  lr: 1.0e-5
-  # Сколько раз повторить каждый режим (каждый прогон — отдельный процесс).
-  # Берётся худший пик, число прогонов уходит в «Условия замера» отчёта:
-  # цифра, снятая один раз, и медиана пяти — разные утверждения.
+  lr: 1.0e-05
   repeats: 1
   sample_interval_seconds: 0.01
-
 lora:
-  alpha_ratio: 2            # lora_alpha = alpha_ratio * r
-  dropout: 0.0
-  # Первый конфиг используется ещё и в замере памяти.
+  alpha_ratio: 2
+  dropout: 0.05
+  # configs используется только командой make inspect.
+  # Для обучения ниже заданы r, alpha и target_modules.
   configs:
-    - name: "r=8, q_proj+v_proj"
-      r: 8
-      target_modules: ["q_proj", "v_proj"]
-    - name: "r=16, все линейные"
-      r: 16
-      target_modules: ["q_proj", "k_proj", "v_proj", "o_proj",
-                       "gate_proj", "up_proj", "down_proj"]
-
+  - name: r=8, q_proj+v_proj
+    r: 8
+    target_modules:
+    - q_proj
+    - v_proj
+  - name: r=16, все линейные
+    r: 16
+    target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  r: 8
+  alpha: 16
+  target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
 report:
-  json: "docs/report.json"
-  markdown: "docs/anatomy.md"
-
-# Данные: русские команды личного планировщика.
+  json: docs/report.json
+  markdown: docs/anatomy.md
 collect:
-  version: "v2"
-  source_manifest: "conf/source.json"
+  version: v2
+  source_manifest: conf/source.json
   sources:
     v1:
-      - "data/source/massive-ru-RU.jsonl"
+    - data/source/massive-ru-RU.jsonl
     v2:
-      - "data/source/massive-ru-RU.jsonl"
+    - data/source/massive-ru-RU.jsonl
   partitions:
-    v1: [train]
-    v2: [train, dev, test]
-  locale: "ru-RU"
-  scenarios: [calendar, lists, alarm]
+    v1:
+    - train
+    v2:
+    - train
+    - dev
+    - test
+  locale: ru-RU
+  scenarios:
+  - calendar
+  - lists
+  - alarm
   min_intent_votes: 2
-  exclude_user_pattern: "(?i)таймер"
+  exclude_user_pattern: (?i)таймер
   labels:
-    alarm_set: "поставить будильник"
-    alarm_query: "посмотреть будильники"
-    alarm_remove: "удалить будильник"
-    calendar_set: "создать событие или напоминание"
-    calendar_query: "посмотреть календарь"
-    calendar_remove: "удалить событие"
-    lists_createoradd: "создать список или добавить пункт"
-    lists_query: "посмотреть список"
-    lists_remove: "удалить список или пункт"
+    alarm_set: поставить будильник
+    alarm_query: посмотреть будильники
+    alarm_remove: удалить будильник
+    calendar_set: создать событие или напоминание
+    calendar_query: посмотреть календарь
+    calendar_remove: удалить событие
+    lists_createoradd: создать список или добавить пункт
+    lists_query: посмотреть список
+    lists_remove: удалить список или пункт
   system_prompts:
-    - "Определи действие для личного планировщика. Верни только одну метку из списка без пояснений."
-    - "Разбери русскую команду о календаре списках или будильнике. Ответь только подходящей меткой."
-    - "Выбери намерение пользователя из разрешённых меток. Не выполняй команду и не добавляй объяснений."
-    - "Ты классифицируешь запросы к планировщику. Выведи одну метку действия без дополнительного текста."
+  - Определи действие для личного планировщика. Верни только одну метку из списка
+    без пояснений.
+  - Разбери русскую команду о календаре списках или будильнике. Ответь только подходящей
+    меткой.
+  - Выбери намерение пользователя из разрешённых меток. Не выполняй команду и не добавляй
+    объяснений.
+  - Ты классифицируешь запросы к планировщику. Выведи одну метку действия без дополнительного
+    текста.
 clean:
   min_user_chars: 5
   max_user_chars: 500
@@ -90,23 +106,20 @@ clean:
     threshold: 0.85
   pii:
     enabled: true
-
 diversity:
   min_examples: 1000
   min_system_prompts: 3
   min_groups: 50
-  max_group_share: 0.10
-  # Ответ — одна из 9 фиксированных меток, разнообразие оцениваем по запросам.
+  max_group_share: 0.1
   min_answer_len_ratio: 1.0
   max_same_length_share: 1.0
   max_duplicate_answer_share: 1.0
   min_labels: 9
-  max_label_share: 0.40
+  max_label_share: 0.4
   min_user_len_ratio: 2.0
   min_unique_user_share: 1.0
-
 split:
-  group_key: "topic"
+  group_key: topic
   ratios:
     train: 0.8
     val: 0.1
@@ -115,31 +128,75 @@ split:
 contamination:
   threshold: 0.85
 paths:
-  raw: "data/raw.jsonl"
-  clean: "data/clean.jsonl"
-  train: "data/train.jsonl"
-  val: "data/val.jsonl"
-  test: "data/test.jsonl"
-  metrics_collect: "metrics/collect.json"
-  metrics_clean: "metrics/clean.json"
-  metrics_diversity: "metrics/diversity.json"
-  metrics_split: "metrics/split.json"
-  metrics_contamination: "metrics/contamination.json"
-
-# Подготовка числовых последовательностей; веса модели не загружаются.
+  raw: data/raw.jsonl
+  clean: data/clean.jsonl
+  train: data/train.jsonl
+  val: data/val.jsonl
+  test: data/test.jsonl
+  metrics_collect: metrics/collect.json
+  metrics_clean: metrics/clean.json
+  metrics_diversity: metrics/diversity.json
+  metrics_split: metrics/split.json
+  metrics_contamination: metrics/contamination.json
+  models: models
+  metrics: metrics
+  curves: docs/curves.png
+  compare: docs/compare.md
 data:
-  train_jsonl: "data/train.jsonl"
-  val_jsonl: "data/val.jsonl"
-  out_dir: "data/tokenized"
+  train_jsonl: data/train.jsonl
+  val_jsonl: data/val.jsonl
+  out_dir: data/tokenized
+  train: data/tokenized/train.pt
+  val: data/tokenized/val.pt
 tokenize:
-  max_seq_len: 224  # наблюдаемый максимум 193; запас до следующего кратного 32
+  max_seq_len: 224
   truncated_warn_ratio: 0.05
-  padding_side: "left"
+  padding_side: left
   batch_size: 8
 packing:
   enabled: false
 train_estimate:
   epochs: 3
-  generation_benchmark: "docs/results/hw01-bench.json"
+  generation_benchmark: docs/results/hw01-bench.json
   slowdown_min: 2
   slowdown_max: 3
+train:
+  seed: 42
+  epochs: 1
+  batch_size: 8
+  grad_accum: 1
+  lr: 0.0002
+  warmup_ratio: 0.03
+  weight_decay: 0.0
+  max_grad_norm: 1.0
+  eval_every: 10
+  eval_batch_size: 8
+  gradient_checkpointing: true
+  max_steps: null
+variants:
+- name: all_layers
+  freeze_first: 0
+- name: freeze14
+  freeze_first: 14
+compare:
+  max_new_tokens: 40
+  prompts:
+  - поставь будильник на семь утра
+  - что у меня запланировано на завтра
+  - добавь молоко в список покупок
+  - удали будильник на выходные
+  - напомни завтра в девять позвонить маме
+  system: 'Разбери русскую команду о календаре списках или будильнике. Ответь только
+    подходящей меткой.
+
+    Метки: alarm_set: поставить будильник; alarm_query: посмотреть будильники; alarm_remove:
+    удалить будильник; calendar_set: создать событие или напоминание; calendar_query:
+    посмотреть календарь; calendar_remove: удалить событие; lists_createoradd: создать
+    список или добавить пункт; lists_query: посмотреть список; lists_remove: удалить
+    список или пункт'
+  expected:
+  - alarm_set
+  - calendar_query
+  - lists_createoradd
+  - alarm_remove
+  - calendar_set

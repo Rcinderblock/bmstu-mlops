@@ -2,98 +2,216 @@ stages:
   tokenize:
     cmd: uv run --locked python -m src.tokenize_data
     deps:
-      - data/train.jsonl
-      - data/val.jsonl
-      - metrics/contamination.json
-      - src/tokenize_data.py
-      - src/prompt.py
-      - src/collate.py
-      - src/config.py
-      - docs/results/hw01-bench.json
-      - uv.lock
-    params: [model, tokenize, packing, train_estimate, data]
+    - data/train.jsonl
+    - data/val.jsonl
+    - metrics/contamination.json
+    - src/tokenize_data.py
+    - src/prompt.py
+    - src/collate.py
+    - src/config.py
+    - docs/results/hw01-bench.json
+    - uv.lock
+    params:
+    - model
+    - tokenize
+    - packing
+    - train_estimate
+    - data
     outs:
-      - data/tokenized
-      - docs/tokenize_report.md:
-          cache: false
+    - data/tokenized
+    - docs/tokenize_report.md:
+        cache: false
     metrics:
-      - metrics/tokenize.json:
-          cache: false
+    - metrics/tokenize.json:
+        cache: false
   collect:
     cmd: uv run --locked python -m src.collect
     deps:
-      - src/collect.py
-      - src/config.py
-      - src/schema.py
-      - src/textnorm.py
-      - conf/source.json
-      - data/source
-      - uv.lock
-    params: [collect, paths.raw, paths.metrics_collect]
-    outs: [data/raw.jsonl]
+    - src/collect.py
+    - src/config.py
+    - src/schema.py
+    - src/textnorm.py
+    - conf/source.json
+    - data/source
+    - uv.lock
+    params:
+    - collect
+    - paths.raw
+    - paths.metrics_collect
+    outs:
+    - data/raw.jsonl
     metrics:
-      - metrics/collect.json:
-          cache: false
+    - metrics/collect.json:
+        cache: false
   clean:
     cmd: uv run --locked python -m src.clean
     deps:
-      - data/raw.jsonl
-      - src/clean.py
-      - src/config.py
-      - src/schema.py
-      - src/dedup.py
-      - src/textnorm.py
-      - src/pii.py
-      - src/stats.py
-      - uv.lock
-    params: [collect.version, clean, contamination, paths.raw, paths.clean, paths.metrics_clean]
-    outs: [data/clean.jsonl]
+    - data/raw.jsonl
+    - src/clean.py
+    - src/config.py
+    - src/schema.py
+    - src/dedup.py
+    - src/textnorm.py
+    - src/pii.py
+    - src/stats.py
+    - uv.lock
+    params:
+    - collect.version
+    - clean
+    - contamination
+    - paths.raw
+    - paths.clean
+    - paths.metrics_clean
+    outs:
+    - data/clean.jsonl
     metrics:
-      - metrics/clean.json:
-          cache: false
+    - metrics/clean.json:
+        cache: false
   diversity:
     cmd: uv run --locked python -m src.diversity
     deps:
-      - data/clean.jsonl
-      - src/diversity.py
-      - src/config.py
-      - src/schema.py
-      - src/textnorm.py
-      - src/stats.py
-      - uv.lock
-    params: [collect.version, diversity, split.group_key, paths.clean, paths.metrics_diversity]
+    - data/clean.jsonl
+    - src/diversity.py
+    - src/config.py
+    - src/schema.py
+    - src/textnorm.py
+    - src/stats.py
+    - uv.lock
+    params:
+    - collect.version
+    - diversity
+    - split.group_key
+    - paths.clean
+    - paths.metrics_diversity
     metrics:
-      - metrics/diversity.json:
-          cache: false
+    - metrics/diversity.json:
+        cache: false
   split:
     cmd: uv run --locked python -m src.split
     deps:
-      - data/clean.jsonl
-      - metrics/diversity.json
-      - src/split.py
-      - src/config.py
-      - src/schema.py
-      - src/textnorm.py
-      - uv.lock
-    params: [collect.version, collect.labels, split, paths.clean, paths.train, paths.val, paths.test, paths.metrics_split]
-    outs: [data/train.jsonl, data/val.jsonl, data/test.jsonl]
+    - data/clean.jsonl
+    - metrics/diversity.json
+    - src/split.py
+    - src/config.py
+    - src/schema.py
+    - src/textnorm.py
+    - uv.lock
+    params:
+    - collect.version
+    - collect.labels
+    - split
+    - paths.clean
+    - paths.train
+    - paths.val
+    - paths.test
+    - paths.metrics_split
+    outs:
+    - data/train.jsonl
+    - data/val.jsonl
+    - data/test.jsonl
     metrics:
-      - metrics/split.json:
-          cache: false
+    - metrics/split.json:
+        cache: false
   contamination:
     cmd: uv run --locked python scripts/check_contamination.py
     deps:
-      - data/train.jsonl
-      - data/val.jsonl
-      - data/test.jsonl
-      - scripts/check_contamination.py
-      - src/contamination.py
-      - src/config.py
-      - src/schema.py
-      - src/dedup.py
-      - src/textnorm.py
-      - uv.lock
-    params: [collect.version, clean.near_dup, contamination, paths.train, paths.val, paths.test, paths.metrics_contamination]
+    - data/train.jsonl
+    - data/val.jsonl
+    - data/test.jsonl
+    - scripts/check_contamination.py
+    - src/contamination.py
+    - src/config.py
+    - src/schema.py
+    - src/dedup.py
+    - src/textnorm.py
+    - uv.lock
+    params:
+    - collect.version
+    - clean.near_dup
+    - contamination
+    - paths.train
+    - paths.val
+    - paths.test
+    - paths.metrics_contamination
     metrics:
-      - metrics/contamination.json:
-          cache: false
+    - metrics/contamination.json:
+        cache: false
+  train_all:
+    cmd: uv run --locked python -m src.train --variant all_layers
+    deps:
+    - data/tokenized/train.pt
+    - data/tokenized/val.pt
+    - src/train.py
+    - src/data.py
+    - src/runtime.py
+    - src/config.py
+    - uv.lock
+    - src/collate.py
+    params:
+    - model
+    - lora
+    - train
+    - variants
+    - paths.models
+    - paths.metrics
+    - data
+    outs:
+    - models/adapter_all_layers
+    metrics:
+    - metrics/train_all_layers.json
+  train_freeze:
+    cmd: uv run --locked python -m src.train --variant freeze14
+    deps:
+    - data/tokenized/train.pt
+    - data/tokenized/val.pt
+    - src/train.py
+    - src/data.py
+    - src/runtime.py
+    - src/config.py
+    - uv.lock
+    - src/collate.py
+    params:
+    - model
+    - lora
+    - train
+    - variants
+    - paths.models
+    - paths.metrics
+    - data
+    outs:
+    - models/adapter_freeze14
+    metrics:
+    - metrics/train_freeze14.json
+  compare:
+    cmd: uv run --locked python -m src.compare --variant all_layers
+    deps:
+    - models/adapter_all_layers
+    - src/compare.py
+    - uv.lock
+    - src/config.py
+    - src/runtime.py
+    - src/prompt.py
+    params:
+    - compare
+    - model
+    - paths.models
+    - paths.metrics
+    - paths.compare
+    outs:
+    - docs/compare.md:
+        cache: false
+    - metrics/compare_all_layers.json
+  curves:
+    cmd: uv run --locked python -m src.plot
+    deps:
+    - metrics/train_all_layers.json
+    - metrics/train_freeze14.json
+    - src/plot.py
+    - src/config.py
+    - uv.lock
+    params:
+    - paths.metrics
+    - paths.curves
+    outs:
+    - docs/curves.png:
+        cache: false

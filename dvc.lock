@@ -387,6 +387,8 @@ stages:
           train_jsonl: data/train.jsonl
           val_jsonl: data/val.jsonl
           out_dir: data/tokenized
+          train: data/tokenized/train.pt
+          val: data/tokenized/val.pt
         model:
           name: Qwen/Qwen3-0.6B
           dtype: bfloat16
@@ -418,3 +420,317 @@ stages:
       hash: md5
       md5: f1bdf6dfebddeec112cea75748cf066f
       size: 3900
+  train_all:
+    cmd: uv run --locked python -m src.train --variant all_layers
+    deps:
+    - path: data/tokenized/train.pt
+      hash: md5
+      md5: 65b9ad3732b96f1ff6a6c3ee154feec6
+      size: 4608481
+    - path: data/tokenized/val.pt
+      hash: md5
+      md5: eb8727041608d71631c4e2ded1edf123
+      size: 592597
+    - path: src/collate.py
+      hash: md5
+      md5: 6343d46a9b501f3a86bd0dd862db5c71
+      size: 1940
+    - path: src/config.py
+      hash: md5
+      md5: d1af94455f9641952ff6c34f46ac6060
+      size: 336
+    - path: src/data.py
+      hash: md5
+      md5: 304e36f2f9496a4cb28cd3e9bd028dd6
+      size: 1673
+    - path: src/runtime.py
+      hash: md5
+      md5: 841b5d77270c415203370c2a1ca99f8f
+      size: 2481
+    - path: src/train.py
+      hash: md5
+      md5: 4234d3179623427ca5d45cb924a28a6e
+      size: 16136
+    - path: uv.lock
+      hash: md5
+      md5: ee23876fca1bd302b971d055ce78b14e
+      size: 231169
+    params:
+      params.yaml:
+        data:
+          train_jsonl: data/train.jsonl
+          val_jsonl: data/val.jsonl
+          out_dir: data/tokenized
+          train: data/tokenized/train.pt
+          val: data/tokenized/val.pt
+        lora:
+          alpha_ratio: 2
+          dropout: 0.05
+          configs:
+          - name: r=8, q_proj+v_proj
+            r: 8
+            target_modules:
+            - q_proj
+            - v_proj
+          - name: r=16, все линейные
+            r: 16
+            target_modules:
+            - q_proj
+            - k_proj
+            - v_proj
+            - o_proj
+            - gate_proj
+            - up_proj
+            - down_proj
+          r: 8
+          alpha: 16
+          target_modules:
+          - q_proj
+          - k_proj
+          - v_proj
+          - o_proj
+          - gate_proj
+          - up_proj
+          - down_proj
+        model:
+          name: Qwen/Qwen3-0.6B
+          dtype: bfloat16
+          device: auto
+          enable_thinking: false
+        paths.metrics: metrics
+        paths.models: models
+        train:
+          seed: 42
+          epochs: 1
+          batch_size: 8
+          grad_accum: 1
+          lr: 0.0002
+          warmup_ratio: 0.03
+          weight_decay: 0.0
+          max_grad_norm: 1.0
+          eval_every: 10
+          eval_batch_size: 8
+          gradient_checkpointing: true
+          max_steps:
+        variants:
+        - name: all_layers
+          freeze_first: 0
+        - name: freeze14
+          freeze_first: 14
+    outs:
+    - path: metrics/train_all_layers.json
+      hash: md5
+      md5: b11bb0f5b8963c37b59b9a17716e5acd
+      size: 14805
+    - path: models/adapter_all_layers
+      hash: md5
+      md5: f193b292b2b1b1fb1c5698afe4d9973e.dir
+      size: 31670886
+      nfiles: 7
+  train_freeze:
+    cmd: uv run --locked python -m src.train --variant freeze14
+    deps:
+    - path: data/tokenized/train.pt
+      hash: md5
+      md5: 65b9ad3732b96f1ff6a6c3ee154feec6
+      size: 4608481
+    - path: data/tokenized/val.pt
+      hash: md5
+      md5: eb8727041608d71631c4e2ded1edf123
+      size: 592597
+    - path: src/collate.py
+      hash: md5
+      md5: 6343d46a9b501f3a86bd0dd862db5c71
+      size: 1940
+    - path: src/config.py
+      hash: md5
+      md5: d1af94455f9641952ff6c34f46ac6060
+      size: 336
+    - path: src/data.py
+      hash: md5
+      md5: 304e36f2f9496a4cb28cd3e9bd028dd6
+      size: 1673
+    - path: src/runtime.py
+      hash: md5
+      md5: 841b5d77270c415203370c2a1ca99f8f
+      size: 2481
+    - path: src/train.py
+      hash: md5
+      md5: 4234d3179623427ca5d45cb924a28a6e
+      size: 16136
+    - path: uv.lock
+      hash: md5
+      md5: ee23876fca1bd302b971d055ce78b14e
+      size: 231169
+    params:
+      params.yaml:
+        data:
+          train_jsonl: data/train.jsonl
+          val_jsonl: data/val.jsonl
+          out_dir: data/tokenized
+          train: data/tokenized/train.pt
+          val: data/tokenized/val.pt
+        lora:
+          alpha_ratio: 2
+          dropout: 0.05
+          configs:
+          - name: r=8, q_proj+v_proj
+            r: 8
+            target_modules:
+            - q_proj
+            - v_proj
+          - name: r=16, все линейные
+            r: 16
+            target_modules:
+            - q_proj
+            - k_proj
+            - v_proj
+            - o_proj
+            - gate_proj
+            - up_proj
+            - down_proj
+          r: 8
+          alpha: 16
+          target_modules:
+          - q_proj
+          - k_proj
+          - v_proj
+          - o_proj
+          - gate_proj
+          - up_proj
+          - down_proj
+        model:
+          name: Qwen/Qwen3-0.6B
+          dtype: bfloat16
+          device: auto
+          enable_thinking: false
+        paths.metrics: metrics
+        paths.models: models
+        train:
+          seed: 42
+          epochs: 1
+          batch_size: 8
+          grad_accum: 1
+          lr: 0.0002
+          warmup_ratio: 0.03
+          weight_decay: 0.0
+          max_grad_norm: 1.0
+          eval_every: 10
+          eval_batch_size: 8
+          gradient_checkpointing: true
+          max_steps:
+        variants:
+        - name: all_layers
+          freeze_first: 0
+        - name: freeze14
+          freeze_first: 14
+    outs:
+    - path: metrics/train_freeze14.json
+      hash: md5
+      md5: 8c14cea30adc95169ddc84cc0c3f167c
+      size: 14809
+    - path: models/adapter_freeze14
+      hash: md5
+      md5: 411eefcad0b02e851d0d4eff076047a7.dir
+      size: 21552424
+      nfiles: 7
+  curves:
+    cmd: uv run --locked python -m src.plot
+    deps:
+    - path: metrics/train_all_layers.json
+      hash: md5
+      md5: b11bb0f5b8963c37b59b9a17716e5acd
+      size: 14805
+    - path: metrics/train_freeze14.json
+      hash: md5
+      md5: 8c14cea30adc95169ddc84cc0c3f167c
+      size: 14809
+    - path: src/config.py
+      hash: md5
+      md5: d1af94455f9641952ff6c34f46ac6060
+      size: 336
+    - path: src/plot.py
+      hash: md5
+      md5: 675ab8cbbcdb318e89fe53b2e6b1a665
+      size: 1666
+    - path: uv.lock
+      hash: md5
+      md5: ee23876fca1bd302b971d055ce78b14e
+      size: 231169
+    params:
+      params.yaml:
+        paths.curves: docs/curves.png
+        paths.metrics: metrics
+    outs:
+    - path: docs/curves.png
+      hash: md5
+      md5: 72f89047b8322048b79de146b969d4e8
+      size: 116507
+  compare:
+    cmd: uv run --locked python -m src.compare --variant all_layers
+    deps:
+    - path: models/adapter_all_layers
+      hash: md5
+      md5: f193b292b2b1b1fb1c5698afe4d9973e.dir
+      size: 31670886
+      nfiles: 7
+    - path: src/compare.py
+      hash: md5
+      md5: ca8114c295b952b5668ea053d8725e40
+      size: 5618
+    - path: src/config.py
+      hash: md5
+      md5: d1af94455f9641952ff6c34f46ac6060
+      size: 336
+    - path: src/prompt.py
+      hash: md5
+      md5: 854d67d2effab1022a93906c9f397312
+      size: 4737
+    - path: src/runtime.py
+      hash: md5
+      md5: 841b5d77270c415203370c2a1ca99f8f
+      size: 2481
+    - path: uv.lock
+      hash: md5
+      md5: ee23876fca1bd302b971d055ce78b14e
+      size: 231169
+    params:
+      params.yaml:
+        compare:
+          max_new_tokens: 40
+          prompts:
+          - поставь будильник на семь утра
+          - что у меня запланировано на завтра
+          - добавь молоко в список покупок
+          - удали будильник на выходные
+          - напомни завтра в девять позвонить маме
+          system: "Разбери русскую команду о календаре списках или будильнике. Ответь
+            только подходящей меткой.\nМетки: alarm_set: поставить будильник; alarm_query:
+            посмотреть будильники; alarm_remove: удалить будильник; calendar_set:
+            создать событие или напоминание; calendar_query: посмотреть календарь;
+            calendar_remove: удалить событие; lists_createoradd: создать список или
+            добавить пункт; lists_query: посмотреть список; lists_remove: удалить
+            список или пункт"
+          expected:
+          - alarm_set
+          - calendar_query
+          - lists_createoradd
+          - alarm_remove
+          - calendar_set
+        model:
+          name: Qwen/Qwen3-0.6B
+          dtype: bfloat16
+          device: auto
+          enable_thinking: false
+        paths.compare: docs/compare.md
+        paths.metrics: metrics
+        paths.models: models
+    outs:
+    - path: docs/compare.md
+      hash: md5
+      md5: 984d63fdc4472d872d7ae0e342557d26
+      size: 2307
+    - path: metrics/compare_all_layers.json
+      hash: md5
+      md5: 9f5e6ffad1bbbddc747f0b7ebbc62986
+      size: 681

@@ -1,0 +1,119 @@
+uv run --locked dvc repro train_all train_freeze curves
+'source.dvc' didn't change, skipping
+Stage 'collect' didn't change, skipping
+Stage 'clean' didn't change, skipping
+Stage 'diversity' didn't change, skipping
+Stage 'split' didn't change, skipping
+Stage 'contamination' didn't change, skipping
+Stage 'tokenize' didn't change, skipping
+Running stage 'train_all':
+> uv run --locked python -m src.train --variant all_layers
+
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]
+Loading weights:  74%|███████▍  | 231/311 [00:00<00:00, 2160.80it/s]
+Loading weights: 100%|██████████| 311/311 [00:00<00:00, 2325.86it/s]
+[all_layers] устройство mps, обучаемых 5,046,272 из 601,096,192 (0.840%); шагов 343
+  шаг 0: val 1.236143 (47.0 с)
+  шаг 1/343: train 1.1058; 4.8 с
+  шаг 10/343: train 0.3392, val 0.441526; прошло 134 с
+  шаг 20/343: train 0.1018, val 0.220823; прошло 248 с
+  шаг 30/343: train 0.0670, val 0.245676; прошло 375 с
+  шаг 40/343: train 0.0186, val 0.133585; прошло 515 с
+  шаг 50/343: train 0.2243, val 0.210648; прошло 639 с
+  шаг 60/343: train 0.0016, val 0.210458; прошло 747 с
+  шаг 70/343: train 0.3188, val 0.176700; прошло 862 с
+  шаг 80/343: train 0.2128, val 0.144356; прошло 970 с
+  шаг 90/343: train 0.0059, val 0.160542; прошло 1106 с
+  шаг 100/343: train 0.0583, val 0.175612; прошло 1234 с
+  шаг 110/343: train 0.0035, val 0.132826; прошло 1329 с
+  шаг 120/343: train 0.2998, val 0.132284; прошло 1455 с
+  шаг 130/343: train 0.3035, val 0.162672; прошло 1577 с
+  шаг 140/343: train 0.7448, val 0.096868; прошло 1701 с
+  шаг 150/343: train 0.0292, val 0.116391; прошло 1831 с
+  шаг 160/343: train 0.1586, val 0.101053; прошло 1942 с
+  шаг 170/343: train 0.0624, val 0.095742; прошло 2052 с
+  шаг 180/343: train 0.0768, val 0.104348; прошло 2153 с
+  шаг 190/343: train 0.1735, val 0.089395; прошло 2252 с
+  шаг 200/343: train 0.1407, val 0.104976; прошло 2357 с
+  шаг 210/343: train 0.1680, val 0.086507; прошло 2468 с
+  шаг 220/343: train 0.7928, val 0.080072; прошло 2587 с
+  шаг 230/343: train 0.0033, val 0.075624; прошло 2708 с
+  шаг 240/343: train 0.0031, val 0.073405; прошло 2814 с
+  шаг 250/343: train 0.0018, val 0.077284; прошло 2915 с
+  шаг 260/343: train 0.1675, val 0.071718; прошло 3033 с
+  шаг 270/343: train 0.0156, val 0.070821; прошло 3172 с
+  шаг 280/343: train 0.0449, val 0.068617; прошло 3280 с
+  шаг 290/343: train 0.0302, val 0.066910; прошло 3408 с
+  шаг 300/343: train 0.0893, val 0.067755; прошло 3538 с
+  шаг 310/343: train 0.0065, val 0.068357; прошло 3663 с
+  шаг 320/343: train 0.0657, val 0.068242; прошло 3776 с
+  шаг 330/343: train 0.1663, val 0.068044; прошло 3876 с
+  шаг 340/343: train 0.0538, val 0.067964; прошло 3976 с
+  шаг 343/343: train 0.1541, val 0.067542; прошло 4056 с
+/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/peft/utils/save_and_load.py:438: UserWarning: Could not find a config file in Qwen/Qwen3-0.6B - will assume that the vocabulary was not modified.
+  warnings.warn(
+[all_layers] 343 шагов за 2062 с; пик памяти 2348 МБ; адаптер 30.2 МБ -> models/adapter_all_layers
+Updating lock file 'dvc.lock'
+
+Running stage 'train_freeze':
+> uv run --locked python -m src.train --variant freeze14
+
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]
+Loading weights:  88%|████████▊ | 273/311 [00:00<00:00, 2527.78it/s]
+Loading weights: 100%|██████████| 311/311 [00:00<00:00, 2288.72it/s]
+[freeze14] устройство mps, обучаемых 2,523,136 из 598,573,056 (0.422%); шагов 343
+  шаг 0: val 1.236143 (44.1 с)
+  шаг 1/343: train 1.1058; 6.1 с
+  шаг 10/343: train 0.5553, val 0.379791; прошло 94 с
+  шаг 20/343: train 0.2204, val 0.267934; прошло 188 с
+  шаг 30/343: train 0.3506, val 0.196126; прошло 288 с
+  шаг 40/343: train 0.3875, val 0.232236; прошло 378 с
+  шаг 50/343: train 0.1585, val 0.254433; прошло 487 с
+  шаг 60/343: train 0.0394, val 0.184605; прошло 581 с
+  шаг 70/343: train 0.1341, val 0.174104; прошло 668 с
+  шаг 80/343: train 0.1747, val 0.172399; прошло 752 с
+  шаг 90/343: train 0.0094, val 0.138373; прошло 853 с
+  шаг 100/343: train 0.0726, val 0.167557; прошло 939 с
+  шаг 110/343: train 0.1018, val 0.136823; прошло 1024 с
+  шаг 120/343: train 0.0670, val 0.155283; прошло 1115 с
+  шаг 130/343: train 0.2586, val 0.154707; прошло 1219 с
+  шаг 140/343: train 0.8888, val 0.169073; прошло 1314 с
+  шаг 150/343: train 0.0120, val 0.218059; прошло 1412 с
+  шаг 160/343: train 0.1380, val 0.143148; прошло 1525 с
+  шаг 170/343: train 0.1327, val 0.138422; прошло 1621 с
+  шаг 180/343: train 0.2539, val 0.122816; прошло 1709 с
+  шаг 190/343: train 0.1480, val 0.113378; прошло 1804 с
+  шаг 200/343: train 0.1116, val 0.120733; прошло 1896 с
+  шаг 210/343: train 0.1436, val 0.115936; прошло 2004 с
+  шаг 220/343: train 0.5619, val 0.115856; прошло 2140 с
+  шаг 230/343: train 0.0373, val 0.115588; прошло 2270 с
+  шаг 240/343: train 0.0038, val 0.109304; прошло 2411 с
+  шаг 250/343: train 0.0046, val 0.112949; прошло 2557 с
+  шаг 260/343: train 0.0629, val 0.109122; прошло 2682 с
+  шаг 270/343: train 0.0163, val 0.107912; прошло 2776 с
+  шаг 280/343: train 0.0846, val 0.104534; прошло 2856 с
+  шаг 290/343: train 0.0318, val 0.103191; прошло 2944 с
+  шаг 300/343: train 0.0952, val 0.103157; прошло 3024 с
+  шаг 310/343: train 0.0388, val 0.103048; прошло 3119 с
+  шаг 320/343: train 0.1529, val 0.103068; прошло 3218 с
+  шаг 330/343: train 0.1260, val 0.103311; прошло 3400 с
+  шаг 340/343: train 0.1135, val 0.103249; прошло 3572 с
+  шаг 343/343: train 0.3322, val 0.102787; прошло 3694 с
+/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/peft/utils/save_and_load.py:438: UserWarning: Could not find a config file in Qwen/Qwen3-0.6B - will assume that the vocabulary was not modified.
+  warnings.warn(
+[freeze14] 343 шагов за 1872 с; пик памяти 2340 МБ; адаптер 20.55 МБ -> models/adapter_freeze14
+Updating lock file 'dvc.lock'
+
+Running stage 'curves':
+> uv run --locked python -m src.plot
+-> docs/curves.png
+Updating lock file 'dvc.lock'
+
+To track the changes with git, run:
+
+	git add dvc.lock
+
+To enable auto staging, run:
+
+	dvc config core.autostage true
+Use `dvc push` to send your updates to remote storage.

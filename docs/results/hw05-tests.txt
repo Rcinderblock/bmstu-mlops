@@ -1,0 +1,47 @@
+uv run --locked python -m unittest discover -s tests -p 'test_*.py' -v
+test_measurement_is_required (test_bench.BenchmarkTests.test_measurement_is_required) ... ok
+test_rss_units_on_macos_and_linux (test_bench.BenchmarkTests.test_rss_units_on_macos_and_linux) ... ok
+test_timers_exclude_preparation_warmup_and_previous_runs (test_bench.BenchmarkTests.test_timers_exclude_preparation_warmup_and_previous_runs) ... ok
+test_waits_for_the_selected_accelerator (test_bench.BenchmarkTests.test_waits_for_the_selected_accelerator) ... ok
+test_warmup_is_required (test_bench.BenchmarkTests.test_warmup_is_required) ... ok
+test_contamination_detects_all_four_types (test_data.DataTests.test_contamination_detects_all_four_types) ... ok
+test_diversity_flags_degenerate_data (test_data.DataTests.test_diversity_flags_degenerate_data) ... ok
+test_exact_jaccard_rejects_false_lsh_positive (test_data.DataTests.test_exact_jaccard_rejects_false_lsh_positive) ... ok
+test_group_assignment_stable_and_aliases (test_data.DataTests.test_group_assignment_stable_and_aliases) ... ok
+test_index_catches_pairs_when_lsh_misses (test_data.DataTests.test_index_catches_pairs_when_lsh_misses) ... ok
+test_matches_exhaustive_jaccard (test_data.DataTests.test_matches_exhaustive_jaccard) ... ok
+test_near_dedup_leaves_no_lexical_overlap (test_data.DataTests.test_near_dedup_leaves_no_lexical_overlap) ... ok
+test_pii_preserves_event_dates (test_data.DataTests.test_pii_preserves_event_dates) ... ok
+test_schema_reports_line_and_rejects_empty_topic (test_data.DataTests.test_schema_reports_line_and_rejects_empty_topic) ... ok
+test_slot_values_share_group_but_different_actions_do_not (test_data.DataTests.test_slot_values_share_group_but_different_actions_do_not) ... ok
+test_hook_cleanup_after_failure_preserves_foreign_hook (test_inspect_model.AnatomyTests.test_hook_cleanup_after_failure_preserves_foreign_hook) ... ok
+test_lora_uses_actual_rectangular_dimensions (test_inspect_model.AnatomyTests.test_lora_uses_actual_rectangular_dimensions) ... ok
+test_metric_names_follow_device (test_inspect_model.AnatomyTests.test_metric_names_follow_device) ... ok
+test_peak_keeps_transient_allocation_and_stops_thread (test_inspect_model.AnatomyTests.test_peak_keeps_transient_allocation_and_stops_thread) ... ok
+test_shared_weights_have_one_owner (test_inspect_model.AnatomyTests.test_shared_weights_have_one_owner) ... ok
+test_bpe_merged_token_is_masked (test_tokenize.TokenizeTests.test_bpe_merged_token_is_masked) ... ok
+test_different_prefix_is_rejected_before_masking (test_tokenize.TokenizeTests.test_different_prefix_is_rejected_before_masking) ... ok
+test_empty_answer_and_empty_batch_rejected (test_tokenize.TokenizeTests.test_empty_answer_and_empty_batch_rejected) ... ok
+test_exact_limit_is_not_truncation (test_tokenize.TokenizeTests.test_exact_limit_is_not_truncation) ... ok
+test_left_padding_preserves_alignment_and_ignores_pad_in_loss (test_tokenize.TokenizeTests.test_left_padding_preserves_alignment_and_ignores_pad_in_loss) ... ok
+test_loss_contains_answer_and_eos_but_not_thinking_or_prompt (test_tokenize.TokenizeTests.test_loss_contains_answer_and_eos_but_not_thinking_or_prompt) ... ok
+test_one_answer_token_retained_at_boundary (test_tokenize.TokenizeTests.test_one_answer_token_retained_at_boundary) ... ok
+test_stage_rejects_excessive_truncation_and_leaves_diagnostics (test_tokenize.TokenizeTests.test_stage_rejects_excessive_truncation_and_leaves_diagnostics) ... ok
+test_statistics_include_dropped_rows_and_threshold_fails (test_tokenize.TokenizeTests.test_statistics_include_dropped_rows_and_threshold_fails) ... ok
+test_training_prefix_and_existing_inference_use_same_template (test_tokenize.TokenizeTests.test_training_prefix_and_existing_inference_use_same_template) ... ok
+test_truncation_before_answer_masks_everything (test_tokenize.TokenizeTests.test_truncation_before_answer_masks_everything) ... ok
+test_adapter_tokenizer_never_falls_back_to_network_or_base (test_train.TrainTests.test_adapter_tokenizer_never_falls_back_to_network_or_base) ... ok
+test_freeze_restricts_real_trainable_matrices_and_preserves_backward (test_train.TrainTests.test_freeze_restricts_real_trainable_matrices_and_preserves_backward) ... ok
+test_invalid_layers_or_dictionary_modules_rejected (test_train.TrainTests.test_invalid_layers_or_dictionary_modules_rejected) ... ok
+test_partial_accumulation_group_is_not_lost (test_train.TrainTests.test_partial_accumulation_group_is_not_lost) ... ok
+test_saved_tokenizer_roundtrip_restores_training_padding_and_template (test_train.TrainTests.test_saved_tokenizer_roundtrip_restores_training_padding_and_template) ... ok
+test_seed_controls_initialization_dropout_numpy_and_python (test_train.TrainTests.test_seed_controls_initialization_dropout_numpy_and_python) ... ok
+test_selected_logits_match_full_loss_and_gradients_with_padding (test_train.TrainTests.test_selected_logits_match_full_loss_and_gradients_with_padding) ... ok
+test_validation_rejects_no_targets (test_train.TrainTests.test_validation_rejects_no_targets) ... ok
+test_validation_weights_by_answer_tokens_and_restores_mode (test_train.TrainTests.test_validation_weights_by_answer_tokens_and_restores_mode) ... ok
+
+----------------------------------------------------------------------
+Ran 40 tests in 3.905s
+
+OK
+test: 0/1 примеров; 0 токенов; в лосс 0; обрезано 1 (100.0%)

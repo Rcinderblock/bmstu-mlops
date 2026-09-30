@@ -24,3 +24,10 @@ params.yaml.orig
 /.dvc/cache/
 /.dvc/tmp/
 /.dvc/config.local
+
+# Локальные результаты обучения; в Git — отчёты и графики.
+/models/
+/metrics/*.json
+*.safetensors
+*.pt
+*.bin
