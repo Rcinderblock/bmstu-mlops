@@ -22,7 +22,7 @@ bash tests/check.sh
   ✓ train_all, train_freeze, compare
 
 8. Разбор дефектов написан
-  ✓ docs/defects.md: разделов 8, слов 757
+  ✓ docs/defects.md: разделов 8, слов 743
 
 9. Гигиена репозитория
   ✓ в git нет весов, данных, мусора и файлов тяжелее 5 МБ
