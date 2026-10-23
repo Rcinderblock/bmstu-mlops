@@ -1,0 +1,14 @@
+{
+  "improved": [
+    "golden-alarm_set-02"
+  ],
+  "regressed": [
+    "golden-calendar_set-06",
+    "golden-calendar_query-04",
+    "golden-calendar_remove-01",
+    "golden-calendar_remove-03",
+    "golden-lists_query-06",
+    "golden-lists_remove-01",
+    "golden-lists_remove-03"
+  ]
+}

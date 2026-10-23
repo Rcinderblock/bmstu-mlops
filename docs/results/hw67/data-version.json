@@ -1,0 +1,15 @@
+{
+  "exact_or_group_intersections": 0,
+  "n_train_index": 2743,
+  "n_golden": 54,
+  "n_behavioral": 5,
+  "train_source_sha256": "0707fd7e598eabb009654a1af9696c545b65c22ba6092fdf06cb9a6802af836c",
+  "train_tensor_sha256": "b73e4b44ab2eedd2815cc2d20d87fb67237e0cdb523d7c37bcded2583edcc449",
+  "model": "Qwen/Qwen3-0.6B",
+  "model_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "train_source_ids_match_tensor_ids": true,
+  "annotations_sha256": "60b2bbab7e2ca8fd3aac0d2d43b31cfe60fa4e40ed5f01ac66556c32e153335f",
+  "golden_source_groups": 19,
+  "max_train_golden_jaccard_3gram": 0.25,
+  "semantic_review": "Поштучный смысловой разбор с помощью агента; человеческая проверка не заявлена. Совпадение намерения ожидаемо; отсутствие всех смысловых утечек не доказано."
+}

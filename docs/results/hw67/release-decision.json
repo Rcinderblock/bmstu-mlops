@@ -1,0 +1,15 @@
+{
+  "quality_gate": {
+    "passed": false,
+    "reason": "Регрессия общей accuracy"
+  },
+  "gate_exit_code": 2,
+  "aliases_before": {
+    "candidate": "1"
+  },
+  "aliases_after": {
+    "candidate": "1"
+  },
+  "promote_executed": false,
+  "baseline_changed": false
+}

@@ -1,0 +1,7 @@
+{
+  "kind": "adapter",
+  "name": "planner-qwen-adapter",
+  "version": "1",
+  "run_id": "e4f47194810e4c4daa7826b58f8fd88d",
+  "uri": "models:/planner-qwen-adapter/1"
+}

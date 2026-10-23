@@ -1,0 +1,31 @@
+{
+  "train_pool": 32,
+  "val_rows": 8,
+  "steps": 4,
+  "consumed_rows": 8,
+  "pool_labels": {
+    "alarm_remove": 3,
+    "alarm_query": 18,
+    "alarm_set": 11
+  },
+  "consumed_labels": {
+    "alarm_query": 6,
+    "alarm_set": 2
+  },
+  "val_labels": {
+    "alarm_set": 3,
+    "calendar_query": 1,
+    "alarm_query": 3,
+    "alarm_remove": 1
+  },
+  "consumed_ids": [
+    "massive-ru-648",
+    "massive-ru-203",
+    "massive-ru-236",
+    "massive-ru-409",
+    "massive-ru-611",
+    "massive-ru-238",
+    "massive-ru-535",
+    "massive-ru-204"
+  ]
+}

@@ -1,0 +1,356 @@
+[
+  {
+    "id": "golden-alarm_set-01",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.9496320410398766
+  },
+  {
+    "id": "golden-alarm_set-02",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 3.7165477910311893
+  },
+  {
+    "id": "golden-alarm_set-03",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 1.838343125069514
+  },
+  {
+    "id": "golden-alarm_set-04",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 1.098331458051689
+  },
+  {
+    "id": "golden-alarm_set-05",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 1.342575167072937
+  },
+  {
+    "id": "golden-alarm_set-06",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.8683428330114111
+  },
+  {
+    "id": "golden-alarm_query-01",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 1.0066767079988495
+  },
+  {
+    "id": "golden-alarm_query-02",
+    "raw": "{\"answer\": \"alarm_query\"}",
+    "error": null,
+    "latency_seconds": 1.0202173340367153
+  },
+  {
+    "id": "golden-alarm_query-03",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.9968213329557329
+  },
+  {
+    "id": "golden-alarm_query-04",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.9265572919975966
+  },
+  {
+    "id": "golden-alarm_query-05",
+    "raw": "{\"answer\": \"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.9636082079960033
+  },
+  {
+    "id": "golden-alarm_query-06",
+    "raw": "{\"answer\":\"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.907148625003174
+  },
+  {
+    "id": "golden-alarm_remove-01",
+    "raw": "{\"answer\": \"alarm_remove\"}",
+    "error": null,
+    "latency_seconds": 0.7485017910366878
+  },
+  {
+    "id": "golden-alarm_remove-02",
+    "raw": "{\"answer\": \"alarm_remove\"}",
+    "error": null,
+    "latency_seconds": 0.8169312500394881
+  },
+  {
+    "id": "golden-alarm_remove-03",
+    "raw": "{\"answer\": \"alarm_remove\"}",
+    "error": null,
+    "latency_seconds": 0.773887375020422
+  },
+  {
+    "id": "golden-alarm_remove-04",
+    "raw": "{\"answer\": \"alarm_remove\"}",
+    "error": null,
+    "latency_seconds": 0.7652963750297204
+  },
+  {
+    "id": "golden-alarm_remove-05",
+    "raw": "{\"answer\":\"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.7841434580041096
+  },
+  {
+    "id": "golden-alarm_remove-06",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.9169463339494541
+  },
+  {
+    "id": "golden-calendar_set-01",
+    "raw": "{\"answer\": \"calendar_set\"}",
+    "error": null,
+    "latency_seconds": 0.8106953750830144
+  },
+  {
+    "id": "golden-calendar_set-02",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.7213941670488566
+  },
+  {
+    "id": "golden-calendar_set-03",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.6900812920648605
+  },
+  {
+    "id": "golden-calendar_set-04",
+    "raw": "{\"answer\":\"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.8269790000049397
+  },
+  {
+    "id": "golden-calendar_set-05",
+    "raw": "{\"answer\": \"calendar_set\"}",
+    "error": null,
+    "latency_seconds": 0.6574120840523392
+  },
+  {
+    "id": "golden-calendar_set-06",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.6807537920540199
+  },
+  {
+    "id": "golden-calendar_query-01",
+    "raw": "{\"answer\":\"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.62656758306548
+  },
+  {
+    "id": "golden-calendar_query-02",
+    "raw": "{\"answer\": \"alarm_query\"}",
+    "error": null,
+    "latency_seconds": 0.5805844169808552
+  },
+  {
+    "id": "golden-calendar_query-03",
+    "raw": "{\"answer\": \"alarm_query\"}",
+    "error": null,
+    "latency_seconds": 0.5366625830065459
+  },
+  {
+    "id": "golden-calendar_query-04",
+    "raw": "{\"answer\": \"alarm_query\"}",
+    "error": null,
+    "latency_seconds": 0.6199637500103563
+  },
+  {
+    "id": "golden-calendar_query-05",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.8040834999410436
+  },
+  {
+    "id": "golden-calendar_query-06",
+    "raw": "{\"answer\": \"alarm_query\"}",
+    "error": null,
+    "latency_seconds": 0.9292765420395881
+  },
+  {
+    "id": "golden-calendar_remove-01",
+    "raw": "{\"answer\": \"alarm_remove\"}",
+    "error": null,
+    "latency_seconds": 1.0008486249716952
+  },
+  {
+    "id": "golden-calendar_remove-02",
+    "raw": "{\"answer\":\"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.961235374910757
+  },
+  {
+    "id": "golden-calendar_remove-03",
+    "raw": "{\"answer\": \"alarm_remove\"}",
+    "error": null,
+    "latency_seconds": 0.9333115419140086
+  },
+  {
+    "id": "golden-calendar_remove-04",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.845088499947451
+  },
+  {
+    "id": "golden-calendar_remove-05",
+    "raw": "{\"answer\":\"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.5785672090714797
+  },
+  {
+    "id": "golden-calendar_remove-06",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.6804981670575216
+  },
+  {
+    "id": "golden-lists_createoradd-01",
+    "raw": "{\"answer\": \"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.9105663750087842
+  },
+  {
+    "id": "golden-lists_createoradd-02",
+    "raw": "{\"answer\": \"lists_createoradd\"}",
+    "error": null,
+    "latency_seconds": 0.9321181249106303
+  },
+  {
+    "id": "golden-lists_createoradd-03",
+    "raw": "{\"answer\": \"lists_createoradd\"}",
+    "error": null,
+    "latency_seconds": 1.1048491669353098
+  },
+  {
+    "id": "golden-lists_createoradd-04",
+    "raw": "{\"answer\": \"lists_createoradd\"}",
+    "error": null,
+    "latency_seconds": 1.3454435410676524
+  },
+  {
+    "id": "golden-lists_createoradd-05",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 1.5808525410247967
+  },
+  {
+    "id": "golden-lists_createoradd-06",
+    "raw": "{\"answer\": \"lists_createoradd\"}",
+    "error": null,
+    "latency_seconds": 1.109853042056784
+  },
+  {
+    "id": "golden-lists_query-01",
+    "raw": "{\"answer\": \"lists_query\"}",
+    "error": null,
+    "latency_seconds": 0.7109277909621596
+  },
+  {
+    "id": "golden-lists_query-02",
+    "raw": "{\"answer\": \"lists_query\"}",
+    "error": null,
+    "latency_seconds": 0.7570304159307852
+  },
+  {
+    "id": "golden-lists_query-03",
+    "raw": "{\"answer\":\"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.6139714999590069
+  },
+  {
+    "id": "golden-lists_query-04",
+    "raw": "{\"answer\":\"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.653213958023116
+  },
+  {
+    "id": "golden-lists_query-05",
+    "raw": "{\"answer\": \"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.6645110830431804
+  },
+  {
+    "id": "golden-lists_query-06",
+    "raw": "{\"answer\":\"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.6009523749817163
+  },
+  {
+    "id": "golden-lists_remove-01",
+    "raw": "{\"answer\":\"alarm_remove\"}",
+    "error": null,
+    "latency_seconds": 0.5849826249759644
+  },
+  {
+    "id": "golden-lists_remove-02",
+    "raw": "{\"answer\": \"lists_remove\"}",
+    "error": null,
+    "latency_seconds": 0.6382768749026582
+  },
+  {
+    "id": "golden-lists_remove-03",
+    "raw": "{\"answer\":\"alarm_remove\"}",
+    "error": null,
+    "latency_seconds": 0.5691227079369128
+  },
+  {
+    "id": "golden-lists_remove-04",
+    "raw": "{\"answer\":\"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.48626450006850064
+  },
+  {
+    "id": "golden-lists_remove-05",
+    "raw": "{\"answer\":\"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.4795772909419611
+  },
+  {
+    "id": "golden-lists_remove-06",
+    "raw": "{\"answer\": \"lists_remove\"}",
+    "error": null,
+    "latency_seconds": 0.6312372499378398
+  },
+  {
+    "id": "behavior-format",
+    "raw": "{\"answer\": \"alarm_set\"}",
+    "error": null,
+    "latency_seconds": 0.8581179999746382
+  },
+  {
+    "id": "behavior-paraphrase-a",
+    "raw": "{\"answer\": \"lists_query\"}",
+    "error": null,
+    "latency_seconds": 0.7651438330067322
+  },
+  {
+    "id": "behavior-paraphrase-b",
+    "raw": "{\"answer\": \"lists_query\"}",
+    "error": null,
+    "latency_seconds": 0.6600973749300465
+  },
+  {
+    "id": "behavior-refusal",
+    "raw": "{\"answer\": \"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.7079017090145499
+  },
+  {
+    "id": "behavior-refusal-science",
+    "raw": "{\"answer\":\"REFUSE\"}",
+    "error": null,
+    "latency_seconds": 0.6278887910302728
+  }
+]

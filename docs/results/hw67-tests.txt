@@ -1,0 +1,45 @@
+uv run --locked python -m unittest discover -s tests -p 'test_*.py' -v
+test_rejected_loss_never_calls_registry (project.test_quality_edges.RegistrationGuard.test_rejected_loss_never_calls_registry) ... ok
+test_bad_revision_type_is_value_error (project.test_quality_edges.ScoringEdges.test_bad_revision_type_is_value_error) ... ok
+test_duplicate_json_key_rejected_even_when_values_equal (project.test_quality_edges.ScoringEdges.test_duplicate_json_key_rejected_even_when_values_equal) ... ok
+test_generation_error_overrules_well_formed_answer (project.test_quality_edges.ScoringEdges.test_generation_error_overrules_well_formed_answer) ... ok
+test_json_constants_and_nonstring_output_do_not_vanish (project.test_quality_edges.ScoringEdges.test_json_constants_and_nonstring_output_do_not_vanish) ... ok
+test_raw_and_parsed_disagreement_rejected (project.test_quality_edges.ScoringEdges.test_raw_and_parsed_disagreement_rejected) ... ok
+test_real_critical_regression_with_overall_improvement (project.test_quality_edges.ScoringEdges.test_real_critical_regression_with_overall_improvement) ... ok
+test_slice_membership_cannot_change_under_equal_counts (project.test_quality_edges.ScoringEdges.test_slice_membership_cannot_change_under_equal_counts) ... ok
+test_behavioral_failure_rejected (test_eval.GateContract.test_behavioral_failure_rejected) ... ok
+test_critical_regression_despite_average_growth (test_eval.GateContract.test_critical_regression_despite_average_growth) ... ok
+test_equal_passes (test_eval.GateContract.test_equal_passes) ... ok
+test_improvement_passes (test_eval.GateContract.test_improvement_passes) ... ok
+test_missing_critical_slice_rejected (test_eval.GateContract.test_missing_critical_slice_rejected) ... ok
+test_missing_nan_empty_error_and_incompatible_rejected (test_eval.GateContract.test_missing_nan_empty_error_and_incompatible_rejected) ... ok
+test_regression_rejected (test_eval.GateContract.test_regression_rejected) ... ok
+test_clean_data (test_eval.LeakageContract.test_clean_data) ... ok
+test_duplicate_golden_questions_rejected (test_eval.LeakageContract.test_duplicate_golden_questions_rejected) ... ok
+test_exact_overlap (test_eval.LeakageContract.test_exact_overlap) ... ok
+test_group_overlap (test_eval.LeakageContract.test_group_overlap) ... ok
+test_too_small_or_missing_behavior (test_eval.LeakageContract.test_too_small_or_missing_behavior) ... ok
+test_no_registry_mutation_when_gate_rejects (test_eval.PromotionContract.test_no_registry_mutation_when_gate_rejects) ... ok
+test_accuracy_uses_all_questions (test_eval.ScoreContract.test_accuracy_uses_all_questions) ... ok
+test_missing_duplicate_empty_rejected (test_eval.ScoreContract.test_missing_duplicate_empty_rejected) ... ok
+test_reordered_outputs_are_matched_by_id (test_eval.ScoreContract.test_reordered_outputs_are_matched_by_id) ... ok
+test_slice_counts_and_per_item (test_eval.ScoreContract.test_slice_counts_and_per_item) ... ok
+test_strict_json_and_label (test_eval.ScoreContract.test_strict_json_and_label) ... ok
+test_wrong_label_is_valid_but_incorrect (test_eval.ScoreContract.test_wrong_label_is_valid_but_incorrect) ... ok
+test_baseline_init_refuses_overwrite (test_pipeline.PipelineContract.test_baseline_init_refuses_overwrite) ... ok
+test_negative_check_does_not_mutate_model_or_alias (test_pipeline.PipelineContract.test_negative_check_does_not_mutate_model_or_alias) ... ok
+test_pass_release_and_explicit_baseline_update (test_pipeline.PipelineContract.test_pass_release_and_explicit_baseline_update) ... ok
+test_protocol_or_raw_changes_rejected (test_pipeline.PipelineContract.test_protocol_or_raw_changes_rejected) ... ok
+test_refused_candidate_keeps_alias (test_pipeline.PipelineContract.test_refused_candidate_keeps_alias) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 0.047s
+
+OK
+Отчёты и сырые ответы сохранены. Далее: make eval; только после PASS - make promote
+PASS: испорченные ответы отклонены, alias не менялся
+Отчёты и сырые ответы сохранены. Далее: make eval; только после PASS - make promote
+champion -> models:/fixture-model/2
+Baseline обновлён явно; старый сохранён. Следующая оценка сравнит с принятой версией
+Отчёты и сырые ответы сохранены. Далее: make eval; только после PASS - make promote
+Отчёты и сырые ответы сохранены. Далее: make eval; только после PASS - make promote
