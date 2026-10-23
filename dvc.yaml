@@ -136,82 +136,15 @@ stages:
     metrics:
     - metrics/contamination.json:
         cache: false
-  train_all:
-    cmd: uv run --locked python -m src.train --variant all_layers
+  eval_data:
+    cmd: uv run --locked python scripts/prepare_evaluation.py
     deps:
+    - scripts/prepare_evaluation.py
+    - data/eval-source/annotations.json
+    - data/train.jsonl
     - data/tokenized/train.pt
-    - data/tokenized/val.pt
-    - src/train.py
-    - src/data.py
-    - src/runtime.py
-    - src/config.py
+    - src/textnorm.py
+    - evaluation/contract.py
     - uv.lock
-    - src/collate.py
-    params:
-    - model
-    - lora
-    - train
-    - variants
-    - paths.models
-    - paths.metrics
-    - data
     outs:
-    - models/adapter_all_layers
-    metrics:
-    - metrics/train_all_layers.json
-  train_freeze:
-    cmd: uv run --locked python -m src.train --variant freeze14
-    deps:
-    - data/tokenized/train.pt
-    - data/tokenized/val.pt
-    - src/train.py
-    - src/data.py
-    - src/runtime.py
-    - src/config.py
-    - uv.lock
-    - src/collate.py
-    params:
-    - model
-    - lora
-    - train
-    - variants
-    - paths.models
-    - paths.metrics
-    - data
-    outs:
-    - models/adapter_freeze14
-    metrics:
-    - metrics/train_freeze14.json
-  compare:
-    cmd: uv run --locked python -m src.compare --variant all_layers
-    deps:
-    - models/adapter_all_layers
-    - src/compare.py
-    - uv.lock
-    - src/config.py
-    - src/runtime.py
-    - src/prompt.py
-    params:
-    - compare
-    - model
-    - paths.models
-    - paths.metrics
-    - paths.compare
-    outs:
-    - docs/compare.md:
-        cache: false
-    - metrics/compare_all_layers.json
-  curves:
-    cmd: uv run --locked python -m src.plot
-    deps:
-    - metrics/train_all_layers.json
-    - metrics/train_freeze14.json
-    - src/plot.py
-    - src/config.py
-    - uv.lock
-    params:
-    - paths.metrics
-    - paths.curves
-    outs:
-    - docs/curves.png:
-        cache: false
+    - data/eval

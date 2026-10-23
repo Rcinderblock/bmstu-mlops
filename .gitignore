@@ -31,3 +31,9 @@ params.yaml.orig
 *.safetensors
 *.pt
 *.bin
+
+# Локальный сервер экспериментов и временные служебные данные.
+/mlruns/
+/mlartifacts/
+/volumes/
+/.pytest_cache/

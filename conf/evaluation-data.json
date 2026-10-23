@@ -1,0 +1,14 @@
+{
+  "url": "https://github.com/Rcinderblock/bmstu-mlops/releases/download/hw67-eval-v1/hw67-evaluation-data-v1.zip",
+  "sha256": "9df138d47d4e720c10cb40b01ef821399c9fe624e5d05347445cdea12c515be8",
+  "bytes": 117753,
+  "files": [
+    "data/eval-source/annotations.json",
+    "data/eval/golden.jsonl",
+    "data/eval/behavioral.jsonl",
+    "data/eval/training-index.jsonl",
+    "data/eval/source-and-leakage.json",
+    "data/eval/nearest-train-review.json",
+    "docs/MASSIVE-LICENSE.txt"
+  ]
+}

@@ -185,7 +185,8 @@ def main() -> None:
     cfg = params['tokenize']
     if cfg['padding_side'] != 'left' or cfg['batch_size'] <= 0 or not 0 <= cfg['truncated_warn_ratio'] <= 1:
         raise ValueError('Нужны левое заполнение, положительный размер батча и порог от 0 до 1')
-    tokenizer = AutoTokenizer.from_pretrained(params['model']['name'])
+    tokenizer = AutoTokenizer.from_pretrained(params['model']['name'],
+                                              revision=params['model'].get('revision'))
     tokenizer.padding_side = cfg['padding_side']
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -195,6 +196,7 @@ def main() -> None:
     for name, key in (('train', 'train_jsonl'), ('val', 'val_jsonl')):
         examples, stats = process_split(tokenizer, name, Path(params['data'][key]), params)
         torch.save({'examples': examples, 'model': params['model']['name'],
+                    'model_revision': params['model'].get('revision'),
                     'max_seq_len': cfg['max_seq_len'], 'padding_side': tokenizer.padding_side,
                     'pad_token_id': tokenizer.pad_token_id}, out_dir / f'{name}.pt')
         splits[name] = stats

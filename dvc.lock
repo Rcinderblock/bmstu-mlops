@@ -30,8 +30,8 @@ stages:
       size: 1844
     - path: uv.lock
       hash: md5
-      md5: ee23876fca1bd302b971d055ce78b14e
-      size: 231169
+      md5: e7de8186d998e5b9eb29851bbe6d55f9
+      size: 274474
     params:
       params.yaml:
         collect:
@@ -123,8 +123,8 @@ stages:
       size: 1844
     - path: uv.lock
       hash: md5
-      md5: ee23876fca1bd302b971d055ce78b14e
-      size: 231169
+      md5: e7de8186d998e5b9eb29851bbe6d55f9
+      size: 274474
     params:
       params.yaml:
         clean:
@@ -182,8 +182,8 @@ stages:
       size: 1844
     - path: uv.lock
       hash: md5
-      md5: ee23876fca1bd302b971d055ce78b14e
-      size: 231169
+      md5: e7de8186d998e5b9eb29851bbe6d55f9
+      size: 274474
     params:
       params.yaml:
         collect.version: v2
@@ -236,8 +236,8 @@ stages:
       size: 1844
     - path: uv.lock
       hash: md5
-      md5: ee23876fca1bd302b971d055ce78b14e
-      size: 231169
+      md5: e7de8186d998e5b9eb29851bbe6d55f9
+      size: 274474
     params:
       params.yaml:
         collect.labels:
@@ -321,8 +321,8 @@ stages:
       size: 1844
     - path: uv.lock
       hash: md5
-      md5: ee23876fca1bd302b971d055ce78b14e
-      size: 231169
+      md5: e7de8186d998e5b9eb29851bbe6d55f9
+      size: 274474
     params:
       params.yaml:
         clean.near_dup:
@@ -375,12 +375,12 @@ stages:
       size: 4737
     - path: src/tokenize_data.py
       hash: md5
-      md5: abef916ec7eb8b55a6e5a0289827cf56
-      size: 15789
+      md5: 804515f22e35aef993a9b6c7b71352d5
+      size: 15948
     - path: uv.lock
       hash: md5
-      md5: ee23876fca1bd302b971d055ce78b14e
-      size: 231169
+      md5: e7de8186d998e5b9eb29851bbe6d55f9
+      size: 274474
     params:
       params.yaml:
         data:
@@ -394,6 +394,7 @@ stages:
           dtype: bfloat16
           device: auto
           enable_thinking: false
+          revision: c1899de289a04d12100db370d81485cdf75e47ca
         packing:
           enabled: false
         tokenize:
@@ -409,8 +410,8 @@ stages:
     outs:
     - path: data/tokenized
       hash: md5
-      md5: 99de1adb164f87ff6021b0f53951afb8.dir
-      size: 5201078
+      md5: bc17bdacab63a01ead0ffe6e1450f98f.dir
+      size: 5201206
       nfiles: 2
     - path: docs/tokenize_report.md
       hash: md5
@@ -734,3 +735,40 @@ stages:
       hash: md5
       md5: 9f5e6ffad1bbbddc747f0b7ebbc62986
       size: 681
+  eval_data:
+    cmd: uv run --locked python scripts/prepare_evaluation.py
+    deps:
+    - path: data/eval-source/annotations.json
+      hash: md5
+      md5: d1f8be3ecee97ce066322d47b677b467
+      size: 34189
+    - path: data/tokenized/train.pt
+      hash: md5
+      md5: 1636c5b13c70e2b9b50b28830abe7316
+      size: 4608545
+    - path: data/train.jsonl
+      hash: md5
+      md5: ce4f6d877f5f95fc8a3d47ed4182586d
+      size: 2750778
+    - path: evaluation/contract.py
+      hash: md5
+      md5: 6d83ad5e8bb53684534075d606f8e519
+      size: 3357
+    - path: scripts/prepare_evaluation.py
+      hash: md5
+      md5: cdbab665a7b5fce1a191cc2d6af161d8
+      size: 3642
+    - path: src/textnorm.py
+      hash: md5
+      md5: c7e2f072fe9cc4d2b5af76f5c360c6c0
+      size: 1844
+    - path: uv.lock
+      hash: md5
+      md5: e7de8186d998e5b9eb29851bbe6d55f9
+      size: 274474
+    outs:
+    - path: data/eval
+      hash: md5
+      md5: 8e8da121184c46c045c86f8362f0aec6.dir
+      size: 558746
+      nfiles: 5

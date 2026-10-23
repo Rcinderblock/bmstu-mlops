@@ -1,0 +1,10 @@
+.git
+.venv
+materials
+notes
+data
+models
+metrics
+.dvc
+.env*
+**/__pycache__
