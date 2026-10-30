@@ -1,0 +1,6 @@
+API http://127.0.0.1:8091
+
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 311/311 [00:00<00:00, 17142.56it/s]
+/opt/homebrew/Cellar/python@3.12/3.12.12_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/resource_tracker.py:279: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

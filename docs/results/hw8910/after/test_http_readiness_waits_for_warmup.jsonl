@@ -1,0 +1,66 @@
+{"event": "subprocess", "arguments": ["init"], "returncode": 0, "stdout": "Создан синтетический стенд: /var/folders/xh/jrybb67s67v2xqlzvqcbyz780000gn/T/tmpbrwmvl1k/workspace\n", "stderr": "", "pointer_sha256_before": null, "pointer_sha256_after": "a64b0d745309845e6135eacbf96d09506f5c4aa82c1dabeb07e24351b6f596c8"}
+{"event": "http", "path": "/health", "payload": null, "status": 200, "response": {"alive": true}}
+{"event": "http", "path": "/health", "payload": null, "status": 200, "response": {"alive": true}}
+{"event": "http", "path": "/debug", "payload": null, "status": 200, "response": {"loaded_id": "fixture-A", "calls": 0, "warmup_finished": false, "load_error": null}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/debug", "payload": null, "status": 200, "response": {"loaded_id": "fixture-A", "calls": 0, "warmup_finished": false, "load_error": null}}
+{"event": "http", "path": "/generate", "payload": {"prompt": "покажи будильники", "max_new_tokens": 32}, "status": 503, "response": {"detail": "Модель ещё не загружена и не прогрета"}}
+{"event": "http", "path": "/debug", "payload": null, "status": 200, "response": {"loaded_id": "fixture-A", "calls": 0, "warmup_finished": false, "load_error": null}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 503, "response": {"ready": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 200, "response": {"ready": true, "model_id": "fixture-A", "runtime_sha256": "bc7bd5a4806e2e0e3b8569666b251d6c59a8d8e01e37fc37bf95b534023ca547"}}
+{"event": "http", "path": "/generate", "payload": {"prompt": "покажи будильники", "max_new_tokens": 32}, "status": 200, "response": {"answer": "STUB ONLY: fixture-A", "output_tokens": 1, "generation_seconds": 0.010942624998278916, "model_id": "fixture-A", "runtime_sha256": "bc7bd5a4806e2e0e3b8569666b251d6c59a8d8e01e37fc37bf95b534023ca547", "request_id": "555e03fe-bb6c-4998-825c-42ff7d26747c", "queue_seconds": 5.832989700138569e-06, "service_seconds": 0.010959458071738482, "backend": "stub"}}

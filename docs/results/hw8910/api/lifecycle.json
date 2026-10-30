@@ -1,0 +1,205 @@
+[
+  {
+    "event": "initial-health",
+    "pid": 28334,
+    "path": "/health",
+    "status": 200,
+    "error": null,
+    "response": {
+      "alive": true
+    },
+    "client_seconds": 0.013360666926018894
+  },
+  {
+    "event": "initial-not-ready",
+    "path": "/ready",
+    "status": 503,
+    "error": "HTTP 503",
+    "response": {
+      "ready": false
+    },
+    "client_seconds": 0.001001124968752265
+  },
+  {
+    "event": "initial-ready",
+    "pid": 28334,
+    "path": "/ready",
+    "status": 200,
+    "error": null,
+    "response": {
+      "ready": true,
+      "model_id": "planner-baseline-c1899de289a0",
+      "runtime_sha256": "1c6c5cd2f5c9a3688e81cc8a55b4e251975b93fcc1c1b0649c6d6ed38e4a49c4"
+    },
+    "client_seconds": 0.0013722500298172235
+  },
+  {
+    "event": "invalid-request",
+    "payload": {
+      "prompt": "",
+      "max_new_tokens": 32
+    },
+    "path": "/generate",
+    "status": 422,
+    "error": "HTTP 422",
+    "response": {
+      "detail": [
+        {
+          "type": "string_too_short",
+          "loc": [
+            "body",
+            "prompt"
+          ],
+          "msg": "String should have at least 1 character",
+          "input": "",
+          "ctx": {
+            "min_length": 1
+          }
+        }
+      ]
+    },
+    "client_seconds": 0.003350459039211273
+  },
+  {
+    "event": "invalid-request",
+    "payload": {
+      "prompt": "покажи будильники",
+      "max_new_tokens": 100000
+    },
+    "path": "/generate",
+    "status": 422,
+    "error": "HTTP 422",
+    "response": {
+      "detail": [
+        {
+          "type": "less_than_equal",
+          "loc": [
+            "body",
+            "max_new_tokens"
+          ],
+          "msg": "Input should be less than or equal to 32",
+          "input": 100000,
+          "ctx": {
+            "le": 32
+          }
+        }
+      ]
+    },
+    "client_seconds": 0.0016748749185353518
+  },
+  {
+    "event": "invalid-request",
+    "payload": {
+      "prompt": "покажи будильники",
+      "max_new_tokens": "32"
+    },
+    "path": "/generate",
+    "status": 422,
+    "error": "HTTP 422",
+    "response": {
+      "detail": [
+        {
+          "type": "int_type",
+          "loc": [
+            "body",
+            "max_new_tokens"
+          ],
+          "msg": "Input should be a valid integer",
+          "input": "32"
+        }
+      ]
+    },
+    "client_seconds": 0.002732541994191706
+  },
+  {
+    "event": "invalid-request",
+    "payload": {
+      "prompt": "покажи будильники",
+      "max_new_tokens": 1
+    },
+    "path": "/generate",
+    "status": 422,
+    "error": "HTTP 422",
+    "response": {
+      "detail": "Разрешён только оценённый лимит: 32"
+    },
+    "client_seconds": 0.0019152919994667172
+  },
+  {
+    "event": "invalid-requests-did-not-compute",
+    "calls_before": 0,
+    "calls_after": 0
+  },
+  {
+    "event": "real-smoke",
+    "path": "/generate",
+    "status": 200,
+    "error": null,
+    "response": {
+      "answer": "{\"answer\": \"alarm_set\"}",
+      "output_tokens": 8,
+      "input_tokens": 261,
+      "generation_seconds": 0.40936333301942796,
+      "model_id": "planner-baseline-c1899de289a0",
+      "runtime_sha256": "1c6c5cd2f5c9a3688e81cc8a55b4e251975b93fcc1c1b0649c6d6ed38e4a49c4",
+      "request_id": "7bfdf05b-58a8-4cdc-b6fd-1d6318f63b68",
+      "queue_seconds": 1.2208009138703346e-05,
+      "service_seconds": 0.4126095420215279,
+      "backend": "transformers"
+    },
+    "client_seconds": 0.41411612497176975
+  },
+  {
+    "event": "restart-health",
+    "pid": 28478,
+    "path": "/health",
+    "status": 200,
+    "error": null,
+    "response": {
+      "alive": true
+    },
+    "client_seconds": 0.013879540958441794
+  },
+  {
+    "event": "restart-not-ready",
+    "path": "/ready",
+    "status": 503,
+    "error": "HTTP 503",
+    "response": {
+      "ready": false
+    },
+    "client_seconds": 0.0010609999299049377
+  },
+  {
+    "event": "restart-ready",
+    "pid": 28478,
+    "path": "/ready",
+    "status": 200,
+    "error": null,
+    "response": {
+      "ready": true,
+      "model_id": "planner-baseline-c1899de289a0",
+      "runtime_sha256": "1c6c5cd2f5c9a3688e81cc8a55b4e251975b93fcc1c1b0649c6d6ed38e4a49c4"
+    },
+    "client_seconds": 0.0014117499813437462
+  },
+  {
+    "event": "restart-real-smoke",
+    "path": "/generate",
+    "status": 200,
+    "error": null,
+    "response": {
+      "answer": "{\"answer\": \"alarm_set\"}",
+      "output_tokens": 8,
+      "input_tokens": 261,
+      "generation_seconds": 0.40921316703315824,
+      "model_id": "planner-baseline-c1899de289a0",
+      "runtime_sha256": "1c6c5cd2f5c9a3688e81cc8a55b4e251975b93fcc1c1b0649c6d6ed38e4a49c4",
+      "request_id": "f67085da-787c-4df0-82d5-f74d6e257d9b",
+      "queue_seconds": 1.7875107005238533e-05,
+      "service_seconds": 0.4136297081131488,
+      "backend": "transformers"
+    },
+    "client_seconds": 0.4172682909993455
+  }
+]

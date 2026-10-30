@@ -1,0 +1,1101 @@
+diff --git a/lab.py b/lab.py
+index 135024c..9950516 100644
+--- a/lab.py
++++ b/lab.py
+@@ -1,11 +1,8 @@
+-"""Исполняемый прототип для расследования. Только синтетические данные, без модели.
+-
+-Запускайте в отдельном каталоге .lab. Этот последовательный прототип надо
+-превратить в корректный Prefect-flow; его зелёный статус не доказывает корректность.
+-"""
++"""Совместимый запуск стенда и процесса Prefect; init создаёт только STUB ONLY."""
+ import argparse
+ import hashlib
+ import json
++import os
+ from pathlib import Path
+ import release
+ 
+@@ -39,10 +36,12 @@ def initialize(root):
+            'artifact_uri':artifact.name,'model_sha256':digest(canonical(files)),
+            'protocol_sha256':'d'*64,'golden_sha256':'e'*64,
+            'runtime_sha256':digest(canonical(runtime)),'runtime':runtime,'file_hashes':files}
++        m.update(backend='stub', synthetic=True)
+         report={k:m[k] for k in ['model_id','model_sha256','protocol_sha256','golden_sha256','runtime_sha256']}
+         report.update(status='complete',passed=True,evaluation_run_id=f'fixture-eval-{version}',metrics={'accuracy':.8,'format_rate':1.0},synthetic=True)
+         write(root/f'manifest-{version}.json',m);write(root/f'report-{version}.json',report)
+     write(root/'accepted.json',read(root/'manifest-A.json'))
++    write(root/'initial-accepted.json',read(root/'manifest-A.json'))
+     report=read(root/'report-B.json');report['status']='running';report['passed']='false'
+     write(root/'report-incomplete.json',report)
+     report=read(root/'report-B.json');report['passed']=False
+@@ -53,32 +52,49 @@ def initialize(root):
+ 
+ 
+ def prepare(root):
+-    config=read(root/'config.json');key=release.cache_key(root/'input.txt',config)
+-    cache=root/'cache';cache.mkdir(exist_ok=True);entry=cache/(key+'.json')
+-    if entry.exists():
+-        result=read(entry);print('CACHE_HIT',result['input_sha256']);return result
+-    payload=(root/'input.txt').read_bytes()
+-    result={'input_sha256':digest(payload),'rows':len(payload.splitlines()),'config':config}
+-    write(entry,result);print('PREPARED',result['input_sha256']);return result
+-
+-
+-def run(root,report_name,fail_after_prepare=False):
+-    prepared=prepare(root)
+-    if fail_after_prepare:raise RuntimeError('Инъекция сбоя после подготовки')
+-    manifest=read(root/'manifest-B.json');report=read(root/report_name)
+-    release.publish(manifest,report,root/'accepted.json')
+-    with (root/'publications.jsonl').open('a') as f:
+-        f.write(json.dumps({'model_id':manifest['model_id'],'prepared':prepared['input_sha256']})+'\n')
+-    print('PUBLISHED',manifest['model_id'])
++    from src.deployment import prepare as prepare_input
++    return prepare_input(root)
++
++
++def run(root, report_name, fail_after_prepare=False, manifest_name='manifest-B.json',
++        fail_after_pointer=False):
++    os.environ.setdefault('PREFECT_HOME', str(Path(__file__).resolve().parent / '.prefect'))
++    os.environ.setdefault('PREFECT_API_URL', 'http://127.0.0.1:4208/api')
++    from urllib.parse import urlparse
++    if urlparse(os.environ['PREFECT_API_URL']).hostname not in ('localhost', '127.0.0.1', '::1'):
++        raise ValueError('Эта работа использует локальный сервер Prefect')
++    os.environ['PREFECT_SERVER_ANALYTICS_ENABLED'] = 'false'
++    from src.prefect_local import local_prefect
++    with local_prefect():
++        from src.release_flow import release_flow
++        return release_flow(str(root), manifest_name, report_name, fail_after_prepare, fail_after_pointer)
++
++
++def rollback(root, manifest_name, report_name):
++    from src.deployment import database
++    manifest = read(root / manifest_name)
++    prior = [read(root / 'initial-accepted.json')] if (root / 'initial-accepted.json').exists() else []
++    with database(root) as conn:
++        prior.extend(json.loads(row[0]) for row in conn.execute("SELECT manifest FROM releases WHERE state='committed'"))
++    keys = ('model_id', 'model_sha256', 'runtime_sha256')
++    if not any(all(old.get(k) == manifest.get(k) for k in keys) for old in prior):
++        raise ValueError('Откат разрешён только к ранее принятой версии')
++    return run(root, report_name, manifest_name=manifest_name)
+ 
+ 
+ def main():
+     parser=argparse.ArgumentParser();parser.add_argument('--workspace',type=Path,default=Path('.lab'))
+     sub=parser.add_subparsers(dest='command',required=True);sub.add_parser('init')
+     run_parser=sub.add_parser('run');run_parser.add_argument('--report',default='report-B.json');run_parser.add_argument('--fail-after-prepare',action='store_true')
++    run_parser.add_argument('--manifest', default='manifest-B.json')
++    run_parser.add_argument('--fail-after-pointer', action='store_true')
++    back = sub.add_parser('rollback')
++    back.add_argument('--manifest', required=True);back.add_argument('--report', required=True)
+     args=parser.parse_args()
+     if args.command=='init':initialize(args.workspace)
+-    else:run(args.workspace,args.report,args.fail_after_prepare)
++    elif args.command == 'rollback':
++        rollback(args.workspace,args.manifest,args.report)
++    else:run(args.workspace,args.report,args.fail_after_prepare,args.manifest,args.fail_after_pointer)
+ 
+ 
+ if __name__=='__main__':main()
+diff --git a/release.py b/release.py
+index 45e8fee..a858d8b 100644
+--- a/release.py
++++ b/release.py
+@@ -1,19 +1,90 @@
+-"""Учебный прототип выпуска. Реализация содержит дефекты; см. CONTRACTS.txt."""
++"""Идентичность входа, полный отчёт и атомарный принятый указатель."""
+ import hashlib
+ import json
++import math
++import os
+ from pathlib import Path
++import re
++import tempfile
++
++HASH_FIELDS = ('model_sha256', 'protocol_sha256', 'golden_sha256', 'runtime_sha256')
++
++
++def canonical(value):
++    return json.dumps(value, sort_keys=True, separators=(',', ':'),
++                      ensure_ascii=False, allow_nan=False).encode('utf-8')
++
++
++def digest(data):
++    return hashlib.sha256(data).hexdigest()
++
++
++def file_sha256(path):
++    result = hashlib.sha256()
++    with Path(path).open('rb') as stream:
++        for chunk in iter(lambda: stream.read(8 * 1024 * 1024), b''):
++            result.update(chunk)
++    return result.hexdigest()
+ 
+ 
+ def cache_key(data_path: Path, config: dict) -> str:
+-    return hashlib.sha256(str(data_path).encode()).hexdigest()
++    return digest(canonical({'data_sha256': file_sha256(data_path), 'config': config}))
+ 
+ 
+ def validate_release(manifest: dict, report: dict) -> None:
+-    if not report.get('passed'):
+-        raise ValueError('Кандидат отклонён')
++    if not isinstance(manifest, dict) or not isinstance(report, dict):
++        raise ValueError('Manifest и отчёт должны быть объектами')
++    if type(manifest.get('schema_version')) is not int or manifest['schema_version'] != 1:
++        raise ValueError('Нужна schema_version: int 1')
++    for key in ('model_id', 'artifact_uri'):
++        if not isinstance(manifest.get(key), str) or not manifest[key].strip():
++            raise ValueError('Нет ' + key)
++    for key in HASH_FIELDS:
++        value = manifest.get(key)
++        if not isinstance(value, str) or re.fullmatch('[0-9a-f]{64}', value) is None:
++            raise ValueError('Некорректный SHA-256: ' + key)
++    runtime = manifest.get('runtime')
++    if not isinstance(runtime, dict) or not runtime:
++        raise ValueError('Нет runtime')
++    try:
++        runtime_hash = digest(canonical(runtime))
++    except (ValueError, TypeError) as exc:
++        raise ValueError('Некорректный runtime') from exc
++    if runtime_hash != manifest['runtime_sha256']:
++        raise ValueError('Runtime изменился после оценки')
++    if report.get('status') != 'complete' or report.get('passed') is not True:
++        raise ValueError('Полная оценка не разрешила выпуск')
++    if not isinstance(report.get('evaluation_run_id'), str) or not report['evaluation_run_id'].strip():
++        raise ValueError('Нет evaluation_run_id')
++    for key in ('model_id', *HASH_FIELDS):
++        if report.get(key) != manifest[key]:
++            raise ValueError('Отчёт не соответствует manifest: ' + key)
++    metrics = report.get('metrics')
++    if not isinstance(metrics, dict):
++        raise ValueError('Нет metrics')
++    for key in ('accuracy', 'format_rate'):
++        value = metrics.get(key)
++        if type(value) not in (int, float) or not math.isfinite(value) or not 0 <= value <= 1:
++            raise ValueError('Некорректная метрика: ' + key)
++
++
++def atomic_bytes(target, raw):
++    target = Path(target)
++    target.parent.mkdir(parents=True, exist_ok=True)
++    name = None
++    try:
++        with tempfile.NamedTemporaryFile(dir=target.parent, prefix='.' + target.name + '-',
++                                         suffix='.tmp', delete=False) as stream:
++            name = stream.name
++            stream.write(raw)
++            stream.flush()
++            os.fsync(stream.fileno())
++        os.replace(name, target)
++    finally:
++        if name is not None:
++            Path(name).unlink(missing_ok=True)
+ 
+ 
+ def publish(manifest: dict, report: dict, target: Path) -> None:
+     validate_release(manifest, report)
+-    target.parent.mkdir(parents=True, exist_ok=True)
+-    target.write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
++    atomic_bytes(target, canonical(manifest) + b'\n')
+diff --git a/service.py b/service.py
+index 9ab3c3c..95d1a20 100644
+--- a/service.py
++++ b/service.py
+@@ -1,80 +1,152 @@
+-"""Лёгкий HTTP-прототип с дефектами. Только localhost, STUB ONLY.
+-
+-Для итогового проекта перенесите исправленный контракт в FastAPI и подключите
+-загрузчик ДЗ 6+7. Прототип нужен для опытов без установки зависимостей и весов.
+-"""
++"""Локальный FastAPI: фактически загруженная версия, готовность и один вычислитель."""
+ import argparse
+-import json
++from contextlib import asynccontextmanager
++from pathlib import Path
+ import threading
+ import time
+ import uuid
+-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+-from pathlib import Path
++
++from fastapi import FastAPI, HTTPException, Request
++from fastapi.responses import JSONResponse
++from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, field_validator
++
++from src.api_backend import StubBackend, TransformersBackend
++from src.deployment import load_accepted
+ 
+ 
+-class StubBackend:
+-    def __init__(self,manifest):
+-        self.loaded_id=manifest['model_id'];self.calls=0;self.runtime_sha256=manifest['runtime_sha256']
++class GenerationRequest(BaseModel):
++    model_config = ConfigDict(extra='forbid')
++    prompt: StrictStr = Field(min_length=1, max_length=2000)
++    max_new_tokens: StrictInt = Field(default=32, ge=1, le=32)
+ 
+-    def generate(self,prompt,limit):
+-        self.calls+=1;time.sleep(.01)
+-        return {'answer':f'STUB ONLY: {self.loaded_id}', 'output_tokens':1}
++    @field_validator('prompt')
++    @classmethod
++    def nonempty(cls, value):
++        if not value.strip():
++            raise ValueError('Нужен непустой prompt')
++        return value
+ 
+ 
+ class ServiceState:
+-    def __init__(self,root,warmup_seconds):
+-        self.root=root;self.ready=True
+-        manifest=json.loads((root/'accepted.json').read_text())
+-        self.backend=StubBackend(manifest)
+-        self.warmup_finished=threading.Event()
+-        def warmup():
+-            time.sleep(warmup_seconds);self.warmup_finished.set()
+-        threading.Thread(target=warmup,daemon=True).start()
+-
+-    def generate(self,request):
+-        started=time.perf_counter()
+-        result=self.backend.generate(request.get('prompt',''),request.get('max_new_tokens',32))
+-        advertised=json.loads((self.root/'accepted.json').read_text())
+-        result.update(model_id=advertised['model_id'],runtime_sha256=advertised['runtime_sha256'],
+-                      request_id=str(uuid.uuid4()),generation_seconds=time.perf_counter()-started)
+-        return result
+-
+-
+-def handler_for(state):
+-    class Handler(BaseHTTPRequestHandler):
+-        def send_json(self,status,payload):
+-            data=json.dumps(payload,ensure_ascii=False).encode()
+-            self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8')
+-            self.send_header('Content-Length',str(len(data)));self.end_headers();self.wfile.write(data)
+-
+-        def do_GET(self):
+-            if self.path=='/health':self.send_json(200,{'alive':True,'backend':'STUB ONLY'})
+-            elif self.path=='/ready':self.send_json(200 if state.ready else 503,{'ready':state.ready})
+-            elif self.path=='/debug':
+-                self.send_json(200,{'loaded_id':state.backend.loaded_id,'calls':state.backend.calls,'warmup_finished':state.warmup_finished.is_set()})
+-            else:self.send_json(404,{'error':'not found'})
+-
+-        def do_POST(self):
+-            if self.path!='/generate':self.send_json(404,{'error':'not found'});return
+-            size=int(self.headers.get('Content-Length','0'))
+-            if size<0 or size>65536:self.send_json(413,{'error':'body too large'});return
++    def __init__(self, root, warmup_seconds, backend_factory=None):
++        self.root = Path(root).resolve()
++        self.backend = None
++        self.ready = False
++        self.error = None
++        self.warmup_finished = threading.Event()
++        self.semaphore = threading.BoundedSemaphore(1)
++        self.closed = threading.Event()
++
++        def load():
++            try:
++                manifest = load_accepted(self.root)
++                factory = backend_factory or {'stub': StubBackend, 'transformers': TransformersBackend}[manifest['backend']]
++                if factory.kind != manifest['backend']:
++                    raise ValueError('Backend не соответствует принятому manifest')
++                self.backend = factory(manifest, self.root)
++                if self.closed.wait(warmup_seconds):
++                    return
++                self.backend.warmup()
++                self.warmup_finished.set()
++                self.ready = True
++            except Exception as exc:
++                self.error = f'{type(exc).__name__}: {exc}'
++                print('LOAD_FAILED', self.error, flush=True)
++        self.loader = threading.Thread(target=load, daemon=True, name='model-loader')
++        self.loader.start()
++
++    def generate(self, request, request_id):
++        if not self.ready or self.backend is None:
++            raise HTTPException(503, 'Модель ещё не загружена и не прогрета')
++        limit = self.backend.runtime['generation']['max_new_tokens']
++        if request.max_new_tokens != limit:
++            raise HTTPException(422, 'Разрешён только оценённый лимит: ' + str(limit))
++        started = time.perf_counter()
++        with self.semaphore:
++            acquired = time.perf_counter()
+             try:
+-                payload=json.loads(self.rfile.read(size))
+-                self.send_json(200,state.generate(payload))
+-            except (ValueError,TypeError,AttributeError,KeyError) as e:
+-                self.send_json(400,{'error':str(e)})
+-    return Handler
++                result = self.backend.generate(request.prompt, limit)
++            except ValueError as exc:
++                raise HTTPException(422, str(exc)) from exc
++            result.update(model_id=self.backend.loaded_id, runtime_sha256=self.backend.runtime_sha256,
++                          request_id=request_id, queue_seconds=acquired-started,
++                          service_seconds=time.perf_counter()-started, backend=self.backend.kind)
++            return result
++
++
++def create_app(root, warmup_seconds=0, backend_factory=None, debug=False):
++    state_holder = {}
++
++    @asynccontextmanager
++    async def lifespan(app):
++        state = ServiceState(root, warmup_seconds, backend_factory)
++        state_holder['state'] = state
++        yield
++        state.ready = False
++        state.closed.set()
++        state.loader.join(timeout=5)
++
++    app = FastAPI(title='Личный планировщик — выпуск модели', lifespan=lifespan)
++
++    @app.middleware('http')
++    async def request_metadata(request: Request, call_next):
++        request.state.request_id = str(uuid.uuid4())
++        raw = request.headers.get('content-length')
++        if raw is not None:
++            try:
++                size = int(raw)
++                if size < 0 or size > 65536:
++                    return JSONResponse({'error': 'body too large', 'request_id': request.state.request_id}, status_code=413)
++            except ValueError:
++                return JSONResponse({'error': 'invalid content-length'}, status_code=400)
++        response = await call_next(request)
++        response.headers['X-Request-ID'] = request.state.request_id
++        return response
++
++    @app.get('/health')
++    def health():
++        return {'alive': True}
++
++    @app.get('/ready')
++    def ready():
++        state = state_holder['state']
++        body = dict(ready=state.ready)
++        if state.ready:
++            body.update(model_id=state.backend.loaded_id, runtime_sha256=state.backend.runtime_sha256)
++        if state.error:
++            body['load_failed'] = True
++        return JSONResponse(body, status_code=200 if state.ready else 503)
++
++    @app.get('/debug', include_in_schema=False)
++    def diagnostics():
++        state = state_holder['state']
++        backend = state.backend
++        if not debug and (backend is None or backend.kind != 'stub'):
++            raise HTTPException(404)
++        return dict(loaded_id=backend.loaded_id if backend else None, calls=backend.calls if backend else 0,
++                    warmup_finished=state.warmup_finished.is_set(), load_error=state.error)
++
++    @app.post('/generate')
++    def generate(payload: GenerationRequest, request: Request):
++        return state_holder['state'].generate(payload, request.state.request_id)
++
++    return app
+ 
+ 
+ def main():
+-    p=argparse.ArgumentParser();p.add_argument('--workspace',type=Path,default=Path('.lab'))
+-    p.add_argument('--port',type=int,default=8091);p.add_argument('--warmup-seconds',type=float,default=5)
+-    args=p.parse_args();state=ServiceState(args.workspace,args.warmup_seconds)
+-    server=ThreadingHTTPServer(('127.0.0.1',args.port),handler_for(state))
+-    print(f'STUB ONLY: http://127.0.0.1:{server.server_port}',flush=True)
+-    try:server.serve_forever()
+-    except KeyboardInterrupt:pass
+-    finally:server.server_close()
++    parser = argparse.ArgumentParser()
++    parser.add_argument('--workspace', type=Path, default=Path('.lab'))
++    parser.add_argument('--port', type=int, default=8091)
++    parser.add_argument('--warmup-seconds', type=float, default=0)
++    parser.add_argument('--debug', action='store_true')
++    args = parser.parse_args()
++    if args.warmup_seconds < 0:
++        parser.error('warmup-seconds должен быть неотрицательным')
++    import uvicorn
++    print('API http://127.0.0.1:' + str(args.port), flush=True)
++    uvicorn.run(create_app(args.workspace, args.warmup_seconds, debug=args.debug),
++                host='127.0.0.1', port=args.port, log_level='warning', access_log=False)
+ 
+ 
+-if __name__=='__main__':main()
++if __name__ == '__main__':
++    main()
+diff --git a/src/api_backend.py b/src/api_backend.py
+new file mode 100644
+index 0000000..ae05c03
+--- /dev/null
++++ b/src/api_backend.py
+@@ -0,0 +1,91 @@
++"""Один интерфейс вычислений: явно синтетический стенд и настоящая модель."""
++import os
++from pathlib import Path
++import time
++
++
++class StubBackend:
++    kind = 'stub'
++
++    def __init__(self, manifest, root):
++        self.loaded_id = manifest['model_id']
++        self.runtime_sha256 = manifest['runtime_sha256']
++        self.runtime = manifest['runtime']
++        self.calls = 0
++
++    def warmup(self):
++        time.sleep(.01)
++
++    def generate(self, prompt, limit):
++        self.calls += 1
++        started = time.perf_counter()
++        time.sleep(.01)
++        return dict(answer='STUB ONLY: ' + self.loaded_id, output_tokens=1,
++                    generation_seconds=time.perf_counter() - started)
++
++
++class TransformersBackend:
++    kind = 'transformers'
++
++    def __init__(self, manifest, root):
++        os.environ.setdefault('PYTORCH_MPS_HIGH_WATERMARK_RATIO', '0.5')
++        os.environ.setdefault('PYTORCH_MPS_LOW_WATERMARK_RATIO', '0.4')
++        from importlib.metadata import version
++        import torch
++        from transformers import AutoModelForCausalLM, AutoTokenizer
++        from src.runtime import resolve_device, resolve_dtype, set_seed
++        from src.deployment import safe_path
++        self.torch = torch
++        self.loaded_id = manifest['model_id']
++        self.runtime_sha256 = manifest['runtime_sha256']
++        self.runtime = manifest['runtime']
++        self.calls = 0
++        for package, expected in self.runtime['packages'].items():
++            if version(package) != expected:
++                raise ValueError('Изменилась версия библиотеки: ' + package)
++        self.device = resolve_device(self.runtime['device'])
++        if self.device.type == 'mps' and not torch.backends.mps.is_available():
++            raise ValueError('Нужна оценка runtime на доступном устройстве')
++        set_seed(self.runtime['generation']['seed'])
++        artifact = safe_path(root, manifest['artifact_dir'])
++        base = safe_path(root, manifest.get('base_artifact_dir', manifest['artifact_dir']))
++        self.tokenizer = AutoTokenizer.from_pretrained(str(artifact), local_files_only=True)
++        self.model = AutoModelForCausalLM.from_pretrained(
++            str(base), local_files_only=True, dtype=resolve_dtype(self.runtime['dtype']))
++        if manifest.get('model_kind') == 'adapter':
++            from peft import PeftModel
++            self.model = PeftModel.from_pretrained(self.model, str(artifact), local_files_only=True)
++        self.model = self.model.to(self.device).eval()
++
++    def synchronize(self):
++        if self.device.type == 'mps':
++            self.torch.mps.synchronize()
++        elif self.device.type == 'cuda':
++            self.torch.cuda.synchronize()
++
++    def _generate(self, prompt, limit):
++        config = self.runtime['generation']
++        text = self.tokenizer.apply_chat_template(
++            [{'role': 'system', 'content': config['system']}, {'role': 'user', 'content': prompt}],
++            tokenize=False, add_generation_prompt=True, enable_thinking=config['enable_thinking'])
++        batch = self.tokenizer(text, return_tensors='pt').to(self.device)
++        n = batch['input_ids'].shape[1]
++        if n > self.runtime['max_input_tokens']:
++            raise ValueError('Слишком длинный вход после токенизации')
++        self.synchronize()
++        started = time.perf_counter()
++        with self.torch.inference_mode():
++            result = self.model.generate(**batch, max_new_tokens=limit, do_sample=False,
++                                        pad_token_id=self.tokenizer.pad_token_id or self.tokenizer.eos_token_id)
++        self.synchronize()
++        seconds = time.perf_counter() - started
++        tokens = result[0, n:]
++        return dict(answer=self.tokenizer.decode(tokens, skip_special_tokens=True),
++                    output_tokens=len(tokens), input_tokens=n, generation_seconds=seconds)
++
++    def warmup(self):
++        self._generate('покажи список включённых будильников', self.runtime['generation']['max_new_tokens'])
++
++    def generate(self, prompt, limit):
++        self.calls += 1
++        return self._generate(prompt, limit)
+diff --git a/src/deployment.py b/src/deployment.py
+new file mode 100644
+index 0000000..04cb707
+--- /dev/null
++++ b/src/deployment.py
+@@ -0,0 +1,210 @@
++"""Постоянный кеш, проверка файлов и журнал выпусков одного писателя."""
++from contextlib import contextmanager
++from datetime import datetime, timezone
++import json
++from pathlib import Path
++import sqlite3
++
++from release import atomic_bytes, cache_key, canonical, digest, file_sha256, publish, validate_release
++
++
++def read(path):
++    return json.loads(Path(path).read_text())
++
++
++def write(path, value):
++    atomic_bytes(Path(path), canonical(value) + b'\n')
++
++
++def now():
++    return datetime.now(timezone.utc).isoformat()
++
++
++def append_attempt(root, event, **fields):
++    with (Path(root) / 'attempts.jsonl').open('a') as stream:
++        stream.write(canonical(dict(event=event, at=now(), **fields)).decode() + '\n')
++
++
++def preparation_config(root):
++    config = read(Path(root) / 'config.json')
++    return {**config, 'processing_source_sha256': file_sha256(Path(__file__))}
++
++
++def preparation_key(root):
++    root = Path(root)
++    return cache_key(root / 'input.txt', preparation_config(root))
++
++
++def prepare(root):
++    root = Path(root)
++    config = preparation_config(root)
++    key = preparation_key(root)
++    path = root / 'cache' / (key + '.json')
++    if path.exists():
++        value = read(path)
++        if value['key'] != key or value['input_sha256'] != file_sha256(root / 'input.txt'):
++            raise ValueError('Повреждён результат подготовки')
++        print('CACHE_HIT', value['input_sha256'], flush=True)
++        return value
++    lines = (root / 'input.txt').read_text().splitlines()
++    if not lines:
++        raise ValueError('Пустой вход подготовки')
++    value = dict(key=key, input_sha256=file_sha256(root / 'input.txt'), rows=len(lines), config=config)
++    if config.get('format') == 'golden-jsonl':
++        from evaluation.contract import fingerprint
++        rows = [json.loads(line) for line in lines if line.strip()]
++        if len(rows) < 50 or len({row['id'] for row in rows}) != len(rows):
++            raise ValueError('Golden: нужны ≥50 уникальных id')
++        for row in rows:
++            if (not isinstance(row.get('input'), str) or not row['input'].strip()
++                    or row.get('expected') not in row.get('choices', [])
++                    or not row.get('source') or not row.get('slices')):
++                raise ValueError('Неверная схема проверочного вопроса')
++        value['semantic_sha256'] = fingerprint(rows)
++    write(path, value)
++    print('PREPARED', value['input_sha256'], flush=True)
++    return value
++
++
++def safe_path(root, relative):
++    root = Path(root).resolve()
++    if not isinstance(relative, str) or Path(relative).is_absolute():
++        raise ValueError('Нужен относительный путь')
++    path = root / relative
++    if not path.resolve().is_relative_to(root) or path.is_symlink():
++        raise ValueError('Путь выходит за каталог артефакта')
++    return path
++
++
++def verify_artifact(root, manifest):
++    hashes = manifest.get('file_hashes')
++    if not isinstance(hashes, dict) or not hashes:
++        raise ValueError('Нет закреплённого списка файлов')
++    base = safe_path(root, manifest.get('artifact_dir', '.'))
++    actual = {}
++    for name, expected in hashes.items():
++        path = safe_path(base, name)
++        if not path.is_file():
++            raise ValueError('Нет файла артефакта: ' + name)
++        actual[name] = file_sha256(path)
++        if actual[name] != expected:
++            raise ValueError('Файл изменился: ' + name)
++    if digest(canonical(actual)) != manifest.get('model_sha256'):
++        raise ValueError('Список файлов не соответствует model_sha256')
++    if manifest.get('backend') == 'transformers':
++        runtime = manifest['runtime']
++        tokenizer_files = {name: actual[name] for name in manifest['tokenizer_files']}
++        if digest(canonical(tokenizer_files)) != runtime['tokenizer_sha256']:
++            raise ValueError('Не совпал токенизатор')
++        if file_sha256(safe_path(base, manifest['template_file'])) != runtime['template_sha256']:
++            raise ValueError('Не совпал шаблон чата')
++        if manifest.get('model_kind') == 'adapter':
++            base_dir = safe_path(root, manifest['base_artifact_dir'])
++            base_hashes = {name: file_sha256(safe_path(base_dir, name)) for name in manifest['base_file_hashes']}
++            if base_hashes != manifest['base_file_hashes']:
++                raise ValueError('Изменились файлы закреплённой базы адаптера')
++    return dict(model_id=manifest['model_id'], model_sha256=manifest['model_sha256'],
++                artifact_uri=manifest['artifact_uri'], files=len(actual))
++
++
++def assess(root, manifest, report_name, prepared):
++    report = read(safe_path(root, report_name))
++    if manifest.get('backend') == 'transformers':
++        if prepared.get('semantic_sha256') != manifest['golden_sha256']:
++            raise ValueError('Изменился golden: нужен новый отчёт оценки')
++        runtime, config = manifest['runtime'], prepared['config']
++        if (config['tokenizer_revision'] != runtime['base_revision']
++                or config['template_sha256'] != runtime['template_sha256']
++                or config['max_length'] != runtime['max_input_tokens']):
++            raise ValueError('Подготовка не соответствует оценённому runtime')
++        from src.release_bridge import verify_bound_report
++        verify_bound_report(Path(root), manifest, report)
++    elif manifest.get('backend') != 'stub' or manifest.get('synthetic') is not True or report.get('synthetic') is not True:
++        raise ValueError('STUB должен быть явно синтетическим')
++    report_hash = digest(canonical(report))
++    write(Path(root) / 'decisions' / (report_hash + '.json'), report)
++    validate_release(manifest, report)
++    return dict(report=report, sha256=report_hash)
++
++
++@contextmanager
++def database(root):
++    conn = sqlite3.connect(Path(root) / 'publications.sqlite3', timeout=10)
++    try:
++        conn.execute('CREATE TABLE IF NOT EXISTS releases (release_id TEXT PRIMARY KEY, model_id TEXT NOT NULL, manifest TEXT NOT NULL, state TEXT NOT NULL, published_at TEXT)')
++        yield conn
++        conn.commit()
++    except BaseException:
++        conn.rollback()
++        raise
++    finally:
++        conn.close()
++
++
++def project_journal(root):
++    with database(root) as conn:
++        rows = conn.execute("SELECT release_id,model_id,published_at FROM releases WHERE state='committed' ORDER BY published_at,release_id").fetchall()
++    raw = b''.join(canonical(dict(release_id=r[0], model_id=r[1], published_at=r[2])) + b'\n' for r in rows)
++    atomic_bytes(Path(root) / 'publications.jsonl', raw)
++
++
++def recover(root):
++    root = Path(root)
++    accepted = read(root / 'accepted.json') if (root / 'accepted.json').exists() else {}
++    with database(root) as conn:
++        for key, payload in conn.execute("SELECT release_id,manifest FROM releases WHERE state='pending'").fetchall():
++            if accepted.get('release_id') == key:
++                if canonical(accepted).decode() != payload:
++                    raise ValueError('Указатель не совпадает с подготовленным выпуском')
++                conn.execute("UPDATE releases SET state='committed',published_at=? WHERE release_id=?", (now(), key))
++                print('RECOVERED_PUBLICATION', key, flush=True)
++            else:
++                conn.execute("UPDATE releases SET state='aborted' WHERE release_id=?", (key,))
++    project_journal(root)
++
++
++def publish_once(root, manifest, decision, fail_after_pointer=False):
++    root = Path(root)
++    report, report_hash = decision['report'], decision['sha256']
++    validate_release(manifest, report)
++    if digest(canonical(report)) != report_hash:
++        raise ValueError('Изменилось решение допуска')
++    verify_artifact(root, manifest)
++    key = digest(canonical(dict(model_id=manifest['model_id'], model_sha256=manifest['model_sha256'],
++                                runtime_sha256=manifest['runtime_sha256'], decision_sha256=report_hash)))
++    accepted = {**manifest, 'release_id': key,
++                'decision': dict(path='decisions/' + report_hash + '.json', sha256=report_hash,
++                                 evaluation_run_id=report['evaluation_run_id'])}
++    with database(root) as conn:
++        conn.execute("INSERT OR IGNORE INTO releases VALUES (?,?,?,'pending',NULL)", (key, manifest['model_id'], canonical(accepted).decode()))
++        conn.execute("UPDATE releases SET state='pending' WHERE release_id=? AND state='aborted'", (key,))
++    target = root / 'accepted.json'
++    if not target.exists() or target.read_bytes() != canonical(accepted) + b'\n':
++        publish(accepted, report, target)
++    if fail_after_pointer:
++        raise RuntimeError('Инъекция сбоя между указателем и журналом')
++    with database(root) as conn:
++        conn.execute("UPDATE releases SET state='committed',published_at=COALESCE(published_at,?) WHERE release_id=?", (now(), key))
++    project_journal(root)
++    print('PUBLISHED', manifest['model_id'], key, flush=True)
++    return dict(release_id=key, model_id=manifest['model_id'], decision_sha256=report_hash)
++
++
++def load_accepted(root):
++    root = Path(root)
++    manifest = read(root / 'accepted.json')
++    if manifest.get('decision'):
++        decision = manifest['decision']
++        report = read(safe_path(root, decision['path']))
++        if digest(canonical(report)) != decision['sha256']:
++            raise ValueError('Изменилось сохранённое решение')
++        if manifest.get('backend') == 'transformers':
++            from src.release_bridge import verify_bound_report
++            verify_bound_report(root, manifest, report)
++    elif manifest.get('backend') == 'stub' and manifest.get('synthetic') is True:
++        report = read(root / ('report-' + manifest['model_id'].rsplit('-', 1)[-1] + '.json'))
++    else:
++        raise ValueError('Нет связанного решения допуска')
++    validate_release(manifest, report)
++    verify_artifact(root, manifest)
++    return manifest
+diff --git a/src/prefect_local.py b/src/prefect_local.py
+new file mode 100644
+index 0000000..684e173
+--- /dev/null
++++ b/src/prefect_local.py
+@@ -0,0 +1,52 @@
++"""Локальный Prefect: использовать работающий сервер или запустить свой на время."""
++from contextlib import contextmanager
++import os
++from pathlib import Path
++import subprocess
++import sys
++import time
++from urllib.request import urlopen
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++@contextmanager
++def local_prefect():
++    os.environ['PREFECT_API_URL'] = 'http://127.0.0.1:4208/api'
++    os.environ['PREFECT_SERVER_ANALYTICS_ENABLED'] = 'false'
++    os.environ['PREFECT_HOME'] = str(ROOT / '.prefect')
++
++    def healthy():
++        try:
++            with urlopen('http://127.0.0.1:4208/api/health', timeout=1) as response:
++                return response.status == 200
++        except Exception:
++            return False
++    proc, log = None, None
++    try:
++        if not healthy():
++            path = ROOT / '.prefect'
++            path.mkdir(exist_ok=True)
++            log = (path / 'local-server.log').open('w')
++            proc = subprocess.Popen([sys.executable, '-m', 'prefect', 'server', 'start',
++                                     '--host', '127.0.0.1', '--port', '4208'],
++                                    stdout=log, stderr=subprocess.STDOUT, env=os.environ)
++            for _ in range(300):
++                if healthy():
++                    break
++                if proc.poll() is not None:
++                    raise RuntimeError('Prefect не запустился; см. .prefect/local-server.log')
++                time.sleep(.1)
++            if not healthy():
++                raise TimeoutError('Prefect не стал готов за 30 секунд')
++        yield
++    finally:
++        if proc is not None and proc.poll() is None:
++            proc.terminate()
++            try:
++                proc.wait(timeout=15)
++            except subprocess.TimeoutExpired:
++                proc.kill()
++                proc.wait(timeout=5)
++        if log is not None:
++            log.close()
+diff --git a/src/release_bridge.py b/src/release_bridge.py
+new file mode 100644
+index 0000000..124bf33
+--- /dev/null
++++ b/src/release_bridge.py
+@@ -0,0 +1,207 @@
++"""Связать сохранённую полную оценку с неизменными файлами и runtime API."""
++import argparse
++import hashlib
++from importlib.metadata import version
++import json
++import os
++from pathlib import Path
++import shutil
++import subprocess
++
++from evaluation.contract import fingerprint, read_rows, validate_golden
++from evaluation.solution import quality_gate, score
++from release import canonical, digest, file_sha256
++from src.deployment import read, safe_path, write
++
++PROJECT = Path(__file__).resolve().parents[1]
++
++
++def evidence(root, manifest):
++    for name, expected in manifest['evidence_hashes'].items():
++        if file_sha256(safe_path(root, name)) != expected:
++            raise ValueError('Изменился исходный отчёт/протокол: ' + name)
++    source = Path(root) / 'evidence'
++    config = read(source / 'params.json')
++    golden, behavior, training = [read_rows(source / name) for name in ['golden.jsonl', 'behavioral.jsonl', 'training-index.jsonl']]
++    validate_golden(golden, training, behavior)
++    code = {p.name: p.read_text() for p in sorted((source / 'evaluation-code').glob('*.py'))}
++    for name in code:
++        if file_sha256(PROJECT / 'evaluation' / name) != file_sha256(source / 'evaluation-code' / name):
++            raise ValueError('Изменился код оценки: ' + name)
++    protocol = fingerprint(dict(config=config, golden=golden, behavioral=behavior, training_index=training, evaluation_code=code))
++    baseline_spec = read(source / 'baseline-spec.json')
++    reports = {role: read(source / (role + '-eval.json')) for role in ['baseline', 'candidate']}
++    for role, report in reports.items():
++        if (report.get('protocol_sha256') != protocol or report.get('golden_sha256') != fingerprint(golden)
++                or report.get('baseline_spec_sha256') != fingerprint(baseline_spec)):
++            raise ValueError('Отчёт относится к другому протоколу/набору')
++        outputs = read(source / (role + '-outputs.json'))
++        if report['outputs_sha256'] != fingerprint(outputs):
++            raise ValueError('Изменились сырые ответы')
++        by_id = {o['id']: o for o in outputs}
++        if len(by_id) != len(outputs) or set(by_id) != {r['id'] for r in golden + behavior}:
++            raise ValueError('Неполный или повторный набор ответов')
++        recalculated = score(golden, [by_id[r['id']] for r in golden])
++        if any(report[k] != recalculated[k] for k in ('overall', 'slices', 'per_item')):
++            raise ValueError('Метрики не соответствуют сырым ответам')
++        if report['behavioral'] != score(behavior, [by_id[r['id']] for r in behavior]):
++            raise ValueError('Behavioral не соответствует сырым ответам')
++    if reports['baseline']['model'] != baseline_spec:
++        raise ValueError('Исходная версия была заменена')
++    if reports['candidate']['model'] != read(source / 'candidate-spec.json'):
++        raise ValueError('Изменился выбранный кандидат')
++    runtime = manifest['runtime']
++    origin = read(source / 'origin.json')
++    generation = dict(system=config['system'], max_new_tokens=config['max_new_tokens'],
++                      enable_thinking=config['enable_thinking'], do_sample=False, seed=config['seed'])
++    if (runtime['generation'] != generation or runtime['base_revision'] != baseline_spec['revision']
++            or runtime['dtype'] != origin['training_manifest']['model']['dtype']
++            or runtime['device'] != origin['training_run']['tags']['device']
++            or runtime['packages'] != origin['packages']):
++        raise ValueError('API не соответствует runtime полной оценки')
++    if manifest['protocol_sha256'] != protocol or manifest['golden_sha256'] != fingerprint(golden):
++        raise ValueError('Manifest относится к другим данным оценки')
++    return config, reports
++
++
++def derive_report(root, manifest):
++    config, reports = evidence(root, manifest)
++    role = manifest['evaluation_role']
++    selected = reports[role]
++    try:
++        decision = quality_gate(reports['baseline'], selected, config['critical_slices'])
++    except ValueError as exc:
++        decision = dict(passed=False, reason=str(exc))
++    return dict(status='complete', passed=decision['passed'],
++                evaluation_run_id=selected['evaluation_run_id'], model_id=manifest['model_id'],
++                **{key: manifest[key] for key in ['model_sha256', 'protocol_sha256', 'golden_sha256', 'runtime_sha256']},
++                metrics={key: selected['overall'][key] for key in ['accuracy', 'format_rate']},
++                gate=decision, source_reports=manifest['evidence_hashes'],
++                decision_kind='retain-evaluated-baseline' if role == 'baseline' else 'candidate-quality-gate',
++                evaluation_reused=True, synthetic=False)
++
++
++def verify_bound_report(root, manifest, report):
++    if report != derive_report(root, manifest):
++        raise ValueError('Решение не связано с полными исходными отчётами и их хешами')
++
++
++def historical_code(tags):
++    commit = tags['git_sha']
++    subprocess.run(['git', 'merge-base', '--is-ancestor', commit, 'HEAD'], cwd=PROJECT, check=True)
++    names = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', commit, 'src'], cwd=PROJECT, text=True).splitlines()
++    h = hashlib.sha256()
++    for name in sorted(n for n in names if n.endswith('.py') and n.count('/') == 1):
++        h.update(Path(name).name.encode())
++        h.update(subprocess.check_output(['git', 'show', commit + ':' + name], cwd=PROJECT))
++    if h.hexdigest() != tags['code_sha256']:
++        raise ValueError('Код исторического training run не совпал с Git')
++    return dict(commit=commit, code_sha256=h.hexdigest(), verified_against_historical_commit=True)
++
++
++def copy_files(source, dest, names):
++    dest.mkdir(parents=True, exist_ok=True)
++    for name in names:
++        p = source / name
++        target = dest / name
++        if not target.exists():
++            try:
++                os.link(p.resolve(), target)
++            except OSError:
++                shutil.copy2(p, target)
++
++
++def initialize(root, reports_dir=None):
++    root = Path(root).resolve()
++    reports_dir = Path(reports_dir or PROJECT / 'metrics')
++    if root.exists():
++        raise FileExistsError('Выберите новый workspace; текущий не перезаписывается')
++    from evaluation.cli import manifest_for, tracking
++    from huggingface_hub import snapshot_download
++    from transformers import AutoTokenizer
++    spec = read(PROJECT / 'metrics/candidate-model.json')
++    training_manifest, adapter = manifest_for(spec)  # именно сохранённая версия, без нового sweep
++    _, client = tracking()
++    run = client.get_run(spec['run_id'])
++    code_proof = historical_code(run.data.tags)
++    requirements = (adapter.parents[1] / 'requirements.txt').read_text().splitlines()
++    packages = {}
++    for name in ['torch', 'transformers', 'peft']:
++        packages[name] = next(line.split('==', 1)[1] for line in requirements if line.startswith(name + '=='))
++        if version(name) != packages[name]:
++            raise ValueError('Нужен прежний runtime или новая оценка: ' + name)
++    baseline_spec = read(PROJECT / 'evaluation/baseline.json')
++    base = Path(snapshot_download(baseline_spec['name'], revision=baseline_spec['revision'], local_files_only=True))
++    root.mkdir(parents=True)
++    source = root / 'evidence';source.mkdir()
++    for role in ['baseline', 'candidate']:
++        for kind in ['eval', 'outputs']:
++            shutil.copy2(reports_dir / f'{role}-{kind}.json', source / f'{role}-{kind}.json')
++    for name in ['golden.jsonl', 'behavioral.jsonl', 'training-index.jsonl']:
++        shutil.copy2(PROJECT / 'data/eval' / name, source / name)
++    shutil.copy2(PROJECT / 'evaluation/params.json', source / 'params.json')
++    shutil.copy2(PROJECT / 'evaluation/baseline.json', source / 'baseline-spec.json')
++    shutil.copy2(PROJECT / 'metrics/candidate-model.json', source / 'candidate-spec.json')
++    (source / 'evaluation-code').mkdir()
++    for p in sorted((PROJECT / 'evaluation').glob('*.py')):
++        shutil.copy2(p, source / 'evaluation-code' / p.name)
++    origin = dict(training_manifest=training_manifest, training_run=dict(run_id=run.info.run_id, tags=run.data.tags),
++                  packages=packages, historical_code=code_proof,
++                  operation='Read an existing training artifact; no training was executed')
++    write(source / 'origin.json', origin)
++    base_names = sorted(p.name for p in base.iterdir() if p.is_file())
++    base_out = root / 'artifacts/base';copy_files(base, base_out, base_names)
++    old_tokenizer = AutoTokenizer.from_pretrained(str(base), local_files_only=True)
++    (base_out / 'chat_template.jinja').write_text(old_tokenizer.chat_template)
++    adapter_names = sorted(p.name for p in adapter.iterdir() if p.is_file())
++    copy_files(adapter, root / 'artifacts/candidate', adapter_names)
++    hashes = {str(p.relative_to(root)): file_sha256(p) for p in sorted(source.rglob('*')) if p.is_file()}
++    config = read(source / 'params.json')
++    reports = {role: read(source / f'{role}-eval.json') for role in ['baseline', 'candidate']}
++    for role, folder in [('baseline', base_out), ('candidate', root / 'artifacts/candidate')]:
++        files = {p.name: file_sha256(p) for p in sorted(folder.iterdir()) if p.is_file()}
++        token_names = sorted(n for n in files if n in ['tokenizer_config.json', 'tokenizer.json', 'vocab.json', 'merges.txt', 'chat_template.jinja'])
++        runtime = dict(base_name=baseline_spec['name'], base_revision=baseline_spec['revision'],
++                       dtype=training_manifest['model']['dtype'], device=run.data.tags['device'],
++                       tokenizer_sha256=digest(canonical({n: files[n] for n in token_names})),
++                       template_sha256=files['chat_template.jinja'], max_input_tokens=4096, packages=packages,
++                       generation=dict(system=config['system'], max_new_tokens=config['max_new_tokens'],
++                                       do_sample=False, seed=config['seed'], enable_thinking=config['enable_thinking']))
++        manifest = dict(schema_version=1, model_id=('planner-baseline-' + baseline_spec['revision'][:12]) if role == 'baseline' else ('planner-adapter-' + spec['run_id']),
++                        artifact_uri=('hf://' + baseline_spec['name'] + '@' + baseline_spec['revision']) if role == 'baseline' else spec['uri'],
++                        backend='transformers', model_kind='base' if role == 'baseline' else 'adapter',
++                        artifact_dir=str(folder.relative_to(root)), base_artifact_dir='artifacts/base', file_hashes=files,
++                        tokenizer_files=token_names, template_file='chat_template.jinja', runtime=runtime,
++                        model_sha256=digest(canonical(files)), runtime_sha256=digest(canonical(runtime)),
++                        protocol_sha256=reports[role]['protocol_sha256'], golden_sha256=reports[role]['golden_sha256'],
++                        evaluation_role=role, source_training_run_id=spec['run_id'],
++                        source_evaluation_run_id=reports[role]['evaluation_run_id'], evidence_hashes=hashes)
++        if role == 'candidate':
++            manifest['base_file_hashes'] = read(root / 'manifest-baseline.json')['file_hashes']
++        write(root / ('manifest-' + role + '.json'), manifest)
++        write(root / ('release-report-' + role + '.json'), derive_report(root, manifest))
++    shutil.copy2(source / 'golden.jsonl', root / 'input.txt')
++    write(root / 'config.json', dict(format='golden-jsonl', tokenizer_revision=baseline_spec['revision'],
++                                    template_sha256=read(root / 'manifest-baseline.json')['runtime']['template_sha256'],
++                                    max_length=4096, code_revision=file_sha256(PROJECT / 'src/deployment.py')))
++    # Доказываем, что экспорт шаблона не изменил реальные входные токены оценки.
++    exported = AutoTokenizer.from_pretrained(str(base_out), local_files_only=True)
++    cases = read_rows(source / 'golden.jsonl') + read_rows(source / 'behavioral.jsonl')
++    for row in cases:
++        messages = [{'role': 'system', 'content': config['system']}, {'role': 'user', 'content': row['input']}]
++        kwargs = dict(tokenize=False, add_generation_prompt=True, enable_thinking=config['enable_thinking'])
++        a, b = old_tokenizer.apply_chat_template(messages, **kwargs), exported.apply_chat_template(messages, **kwargs)
++        if a != b or old_tokenizer(a)['input_ids'] != exported(b)['input_ids']:
++            raise ValueError('Изменилось построение входа; нужна новая оценка')
++    write(root / 'tokenizer-equivalence.json', dict(cases=len(cases), identical_chat_text=True, identical_token_ids=True))
++    print('Готовы manifest и связанные отчёты. Новое обучение/генерация не выполнялись.', flush=True)
++    print('baseline gate:', read(root / 'release-report-baseline.json')['passed'],
++          'candidate gate:', read(root / 'release-report-candidate.json')['passed'], flush=True)
++
++
++if __name__ == '__main__':
++    parser = argparse.ArgumentParser()
++    parser.add_argument('--workspace', type=Path, default=Path('deployments/planner'))
++    parser.add_argument('--reports-dir', type=Path, default=Path('metrics'))
++    args = parser.parse_args()
++    initialize(args.workspace, args.reports_dir)
+diff --git a/src/release_flow.py b/src/release_flow.py
+new file mode 100644
+index 0000000..7b9e112
+--- /dev/null
++++ b/src/release_flow.py
+@@ -0,0 +1,90 @@
++"""Четыре задачи Prefect: подготовка → артефакт → допуск → публикация."""
++from pathlib import Path
++import uuid
++
++from prefect import flow, task
++from prefect.cache_policies import NO_CACHE
++from prefect.context import get_run_context
++from prefect.filesystems import LocalFileSystem
++
++from src import deployment as core
++
++
++def input_key(context, parameters):
++    # Отдельные стенды не заимствуют путь результата из чужого удаляемого workspace.
++    # Содержательная идентичность остаётся path-independent в release.cache_key.
++    from release import canonical, digest
++    root = str(Path(parameters['root']).resolve())
++    return digest(canonical(dict(storage_scope=root, content_key=core.preparation_key(root))))
++
++
++@task(name='validate-input', persist_result=True, cache_key_fn=input_key,
++      result_serializer='json', cache_result_in_memory=False)
++def prepare_input(root):
++    return core.prepare(root)
++
++
++def transient_only(task, task_run, state):
++    try:
++        state.result()
++    except (ConnectionError, TimeoutError):
++        return True
++    except Exception:
++        return False
++    return False
++
++
++@task(name='retrieve-artifact', cache_policy=NO_CACHE, retries=2,
++      retry_delay_seconds=[.2, .5], retry_condition_fn=transient_only)
++def retrieve_artifact(root, manifest_name):
++    manifest = core.read(core.safe_path(root, manifest_name))
++    verification = core.verify_artifact(root, manifest)
++    return dict(manifest=manifest, verification=verification,
++                operation='read-existing-artifact; no training')
++
++
++@task(name='evaluate-release', cache_policy=NO_CACHE, retries=0)
++def evaluate_release(root, artifact, report_name, prepared):
++    return core.assess(root, artifact['manifest'], report_name, prepared)
++
++
++@task(name='publish-accepted', cache_policy=NO_CACHE, retries=0)
++def publish_accepted(root, artifact, decision, fail_after_pointer):
++    return core.publish_once(root, artifact['manifest'], decision, fail_after_pointer)
++
++
++@flow(name='planner-release', log_prints=False, retries=0)
++def release_flow(root, manifest_name='manifest-B.json', report_name='report-B.json',
++                 fail_after_prepare=False, fail_after_pointer=False):
++    root = str(Path(root).resolve())
++    run_id = str(get_run_context().flow_run.id)
++    attempt = str(uuid.uuid4())
++    core.append_attempt(root, 'started', attempt_id=attempt, flow_run_id=run_id)
++    print('FLOW_RUN_ID', run_id, flush=True)
++
++    def record(name, state):
++        core.append_attempt(root, 'task', attempt_id=attempt, flow_run_id=run_id,
++                            task=name, state=state.name, task_run_id=str(state.state_details.task_run_id))
++        return state.result()
++
++    try:
++        core.recover(root)
++        storage = LocalFileSystem(basepath=str(Path(root) / '.prefect-results'))
++        from release import digest
++        storage.save('planner-results-' + digest(root.encode())[:20], overwrite=True)
++        state = prepare_input.with_options(result_storage=storage)(root, return_state=True)
++        prepared = record('prepare', state)
++        print('PREPARE_TASK_STATE', state.name, flush=True)
++        if state.name == 'Cached':
++            print('CACHE_HIT', prepared['input_sha256'], flush=True)
++        if fail_after_prepare:
++            raise RuntimeError('Инъекция сбоя после подготовки')
++        artifact = record('artifact', retrieve_artifact(root, manifest_name, return_state=True))
++        decision = record('gate', evaluate_release(root, artifact, report_name, prepared, return_state=True))
++        result = record('publish', publish_accepted(root, artifact, decision, fail_after_pointer, return_state=True))
++        core.append_attempt(root, 'completed', attempt_id=attempt, flow_run_id=run_id, **result)
++        return dict(flow_run_id=run_id, prepare_state=state.name, **result)
++    except Exception as exc:
++        core.append_attempt(root, 'failed', attempt_id=attempt, flow_run_id=run_id,
++                            error=f'{type(exc).__name__}: {exc}')
++        raise

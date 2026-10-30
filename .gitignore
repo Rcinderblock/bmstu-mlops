@@ -41,3 +41,5 @@ params.yaml.orig
 /.lab*/
 /deployments/
 /artifacts/
+
+/.venv-fast/

@@ -1,0 +1,11 @@
+{
+  "python": "3.12.12",
+  "system": "macOS-26.6.2-arm64-arm-64bit",
+  "machine": "arm64",
+  "cpu": "Apple M3",
+  "memory_bytes": 17179869184,
+  "device": "mps",
+  "dtype": "bfloat16",
+  "theoretical_kv_bytes_per_token_per_sequence": 114688,
+  "kv_is_estimate_not_measurement": true
+}

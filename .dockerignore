@@ -8,3 +8,8 @@ metrics
 .dvc
 .env*
 **/__pycache__
+
+.venv-fast
+.prefect
+deployments
+artifacts

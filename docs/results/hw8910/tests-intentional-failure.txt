@@ -1,0 +1,78 @@
+test_changed_bytes_at_same_path_invalidate_cache (test_release.ReleaseContractTests.test_changed_bytes_at_same_path_invalidate_cache) ... FAIL
+test_complete_bound_report_allowed (test_release.ReleaseContractTests.test_complete_bound_report_allowed) ... ok
+test_every_preparation_setting_invalidates_cache (test_release.ReleaseContractTests.test_every_preparation_setting_invalidates_cache) ...
+  test_every_preparation_setting_invalidates_cache (test_release.ReleaseContractTests.test_every_preparation_setting_invalidates_cache) (key='tokenizer_revision') ... FAIL
+  test_every_preparation_setting_invalidates_cache (test_release.ReleaseContractTests.test_every_preparation_setting_invalidates_cache) (key='template_sha256') ... FAIL
+  test_every_preparation_setting_invalidates_cache (test_release.ReleaseContractTests.test_every_preparation_setting_invalidates_cache) (key='max_length') ... FAIL
+  test_every_preparation_setting_invalidates_cache (test_release.ReleaseContractTests.test_every_preparation_setting_invalidates_cache) (key='code_revision') ... FAIL
+test_failed_atomic_replace_preserves_previous_bytes (test_release.ReleaseContractTests.test_failed_atomic_replace_preserves_previous_bytes) ... ok
+test_incomplete_false_and_truthy_string_rejected (test_release.ReleaseContractTests.test_incomplete_false_and_truthy_string_rejected) ... ok
+test_invalid_digest_and_schema_rejected (test_release.ReleaseContractTests.test_invalid_digest_and_schema_rejected) ... ok
+test_invalid_metric_rejected (test_release.ReleaseContractTests.test_invalid_metric_rejected) ... ok
+test_key_ignores_path_and_mapping_order (test_release.ReleaseContractTests.test_key_ignores_path_and_mapping_order) ... FAIL
+test_missing_fields_rejected (test_release.ReleaseContractTests.test_missing_fields_rejected) ... ok
+test_publish_and_repeat (test_release.ReleaseContractTests.test_publish_and_repeat) ... ok
+test_rejection_preserves_previous_bytes (test_release.ReleaseContractTests.test_rejection_preserves_previous_bytes) ... ok
+test_report_binding_mismatch_rejected (test_release.ReleaseContractTests.test_report_binding_mismatch_rejected) ... ok
+test_runtime_change_with_stale_hash_rejected (test_release.ReleaseContractTests.test_runtime_change_with_stale_hash_rejected) ... ok
+
+======================================================================
+FAIL: test_changed_bytes_at_same_path_invalidate_cache (test_release.ReleaseContractTests.test_changed_bytes_at_same_path_invalidate_cache)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_release.py", line 42, in test_changed_bytes_at_same_path_invalidate_cache
+    self.assertNotEqual(old,release.cache_key(self.data,self.config))
+AssertionError: 'b96748c2be29c681695f30ba139d29dd46127c6a45601e842e6fc3d1b0370001' == 'b96748c2be29c681695f30ba139d29dd46127c6a45601e842e6fc3d1b0370001'
+
+======================================================================
+FAIL: test_every_preparation_setting_invalidates_cache (test_release.ReleaseContractTests.test_every_preparation_setting_invalidates_cache) (key='tokenizer_revision')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_release.py", line 48, in test_every_preparation_setting_invalidates_cache
+    config={**self.config,key:value};self.assertNotEqual(old,release.cache_key(self.data,config))
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '178d294c98d45c7c06eaa25c58a1b356a9d3054a948c45ce1bb999cea3b8649e' == '178d294c98d45c7c06eaa25c58a1b356a9d3054a948c45ce1bb999cea3b8649e'
+
+======================================================================
+FAIL: test_every_preparation_setting_invalidates_cache (test_release.ReleaseContractTests.test_every_preparation_setting_invalidates_cache) (key='template_sha256')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_release.py", line 48, in test_every_preparation_setting_invalidates_cache
+    config={**self.config,key:value};self.assertNotEqual(old,release.cache_key(self.data,config))
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '178d294c98d45c7c06eaa25c58a1b356a9d3054a948c45ce1bb999cea3b8649e' == '178d294c98d45c7c06eaa25c58a1b356a9d3054a948c45ce1bb999cea3b8649e'
+
+======================================================================
+FAIL: test_every_preparation_setting_invalidates_cache (test_release.ReleaseContractTests.test_every_preparation_setting_invalidates_cache) (key='max_length')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_release.py", line 48, in test_every_preparation_setting_invalidates_cache
+    config={**self.config,key:value};self.assertNotEqual(old,release.cache_key(self.data,config))
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '178d294c98d45c7c06eaa25c58a1b356a9d3054a948c45ce1bb999cea3b8649e' == '178d294c98d45c7c06eaa25c58a1b356a9d3054a948c45ce1bb999cea3b8649e'
+
+======================================================================
+FAIL: test_every_preparation_setting_invalidates_cache (test_release.ReleaseContractTests.test_every_preparation_setting_invalidates_cache) (key='code_revision')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_release.py", line 48, in test_every_preparation_setting_invalidates_cache
+    config={**self.config,key:value};self.assertNotEqual(old,release.cache_key(self.data,config))
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '178d294c98d45c7c06eaa25c58a1b356a9d3054a948c45ce1bb999cea3b8649e' == '178d294c98d45c7c06eaa25c58a1b356a9d3054a948c45ce1bb999cea3b8649e'
+
+======================================================================
+FAIL: test_key_ignores_path_and_mapping_order (test_release.ReleaseContractTests.test_key_ignores_path_and_mapping_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_release.py", line 38, in test_key_ignores_path_and_mapping_order
+    self.assertEqual(key,release.cache_key(other,dict(reversed(list(self.config.items())))))
+AssertionError: '9a5d2a834776965404b835884c69b679dbd0309c404c4f91f1bbd9db1052b79d' != '3d1aa4c0076c57d67e3ea8a4dd95552233ccbfeca43cb25c8156342f6c7f6d25'
+- 9a5d2a834776965404b835884c69b679dbd0309c404c4f91f1bbd9db1052b79d
++ 3d1aa4c0076c57d67e3ea8a4dd95552233ccbfeca43cb25c8156342f6c7f6d25
+
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.010s
+
+FAILED (failures=6)
+Реальные тесты отклонили копию с поломанным cache_key; рабочий файл восстановлен/не изменён.

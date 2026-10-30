@@ -1,0 +1,5 @@
+{"event": "subprocess", "arguments": ["init"], "returncode": 0, "stdout": "Создан синтетический стенд: /var/folders/xh/jrybb67s67v2xqlzvqcbyz780000gn/T/tmpm693fb_m/workspace\n", "stderr": "", "pointer_sha256_before": null, "pointer_sha256_after": "aca0bc1332936349f868b84d800dec94e1a042f4aec3196fe4c4c031c3b5c6d1"}
+{"event": "http", "path": "/health", "payload": null, "status": 200, "response": {"alive": true, "backend": "STUB ONLY"}}
+{"event": "http", "path": "/ready", "payload": null, "status": 200, "response": {"ready": true}}
+{"event": "http", "path": "/debug", "payload": null, "status": 200, "response": {"loaded_id": "fixture-A", "calls": 0, "warmup_finished": true}}
+{"event": "http", "path": "/generate", "payload": {"prompt": "", "max_new_tokens": 32}, "status": 200, "response": {"answer": "STUB ONLY: fixture-A", "output_tokens": 1, "model_id": "fixture-A", "runtime_sha256": "bc7bd5a4806e2e0e3b8569666b251d6c59a8d8e01e37fc37bf95b534023ca547", "request_id": "3030f835-c551-491e-b2bb-6ac4026c1210", "generation_seconds": 0.01035950006917119}}

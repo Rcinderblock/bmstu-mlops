@@ -1,0 +1,183 @@
+[
+  {
+    "name": "01-fail-after-prepare",
+    "command": [
+      "/Users/ralolaev/bmstu/MLOps/.venv/bin/python3",
+      "/Users/ralolaev/bmstu/MLOps/lab.py",
+      "--workspace",
+      "/Users/ralolaev/bmstu/MLOps/deployments/planner",
+      "run",
+      "--manifest",
+      "manifest-baseline.json",
+      "--report",
+      "release-report-baseline.json",
+      "--fail-after-prepare"
+    ],
+    "exit_code": 1,
+    "pointer_sha256_before": null,
+    "pointer_sha256_after": null,
+    "flow_run_id": "4c85aeeb-698a-4ce1-abe6-5dc4bf9c90bf",
+    "prepared": true,
+    "cache_hit": false
+  },
+  {
+    "name": "02-resume-new-process",
+    "command": [
+      "/Users/ralolaev/bmstu/MLOps/.venv/bin/python3",
+      "/Users/ralolaev/bmstu/MLOps/lab.py",
+      "--workspace",
+      "/Users/ralolaev/bmstu/MLOps/deployments/planner",
+      "run",
+      "--manifest",
+      "manifest-baseline.json",
+      "--report",
+      "release-report-baseline.json"
+    ],
+    "exit_code": 0,
+    "pointer_sha256_before": null,
+    "pointer_sha256_after": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "flow_run_id": "fc87a0d9-2e8a-4d50-a842-9d33a32bd4d1",
+    "prepared": false,
+    "cache_hit": true
+  },
+  {
+    "name": "03-idempotent-repeat",
+    "command": [
+      "/Users/ralolaev/bmstu/MLOps/.venv/bin/python3",
+      "/Users/ralolaev/bmstu/MLOps/lab.py",
+      "--workspace",
+      "/Users/ralolaev/bmstu/MLOps/deployments/planner",
+      "run",
+      "--manifest",
+      "manifest-baseline.json",
+      "--report",
+      "release-report-baseline.json"
+    ],
+    "exit_code": 0,
+    "pointer_sha256_before": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "pointer_sha256_after": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "flow_run_id": "3eb0b059-c35f-4ba6-9519-d5dd77b6efa5",
+    "prepared": false,
+    "cache_hit": true
+  },
+  {
+    "name": "04-change-input-same-path",
+    "command": [
+      "/Users/ralolaev/bmstu/MLOps/.venv/bin/python3",
+      "/Users/ralolaev/bmstu/MLOps/lab.py",
+      "--workspace",
+      "/Users/ralolaev/bmstu/MLOps/deployments/planner",
+      "run",
+      "--manifest",
+      "manifest-baseline.json",
+      "--report",
+      "release-report-baseline.json"
+    ],
+    "exit_code": 1,
+    "pointer_sha256_before": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "pointer_sha256_after": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "flow_run_id": "b57dafe5-b555-41df-80d1-947ec9d20f9e",
+    "prepared": true,
+    "cache_hit": false
+  },
+  {
+    "name": "05-candidate-quality-rejection",
+    "command": [
+      "/Users/ralolaev/bmstu/MLOps/.venv/bin/python3",
+      "/Users/ralolaev/bmstu/MLOps/lab.py",
+      "--workspace",
+      "/Users/ralolaev/bmstu/MLOps/deployments/planner",
+      "run",
+      "--manifest",
+      "manifest-candidate.json",
+      "--report",
+      "release-report-candidate.json"
+    ],
+    "exit_code": 1,
+    "pointer_sha256_before": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "pointer_sha256_after": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "flow_run_id": "df846bef-f467-4979-a691-fb6ed9702ab4",
+    "prepared": false,
+    "cache_hit": true
+  },
+  {
+    "name": "06-incomplete",
+    "command": [
+      "/Users/ralolaev/bmstu/MLOps/.venv/bin/python3",
+      "/Users/ralolaev/bmstu/MLOps/lab.py",
+      "--workspace",
+      "/Users/ralolaev/bmstu/MLOps/deployments/planner",
+      "run",
+      "--manifest",
+      "manifest-baseline.json",
+      "--report",
+      "negative-incomplete.json"
+    ],
+    "exit_code": 1,
+    "pointer_sha256_before": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "pointer_sha256_after": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "flow_run_id": "9ee202ef-e84a-4fee-a383-a28098236ffb",
+    "prepared": false,
+    "cache_hit": true
+  },
+  {
+    "name": "07-truthy-string",
+    "command": [
+      "/Users/ralolaev/bmstu/MLOps/.venv/bin/python3",
+      "/Users/ralolaev/bmstu/MLOps/lab.py",
+      "--workspace",
+      "/Users/ralolaev/bmstu/MLOps/deployments/planner",
+      "run",
+      "--manifest",
+      "manifest-baseline.json",
+      "--report",
+      "negative-truthy-string.json"
+    ],
+    "exit_code": 1,
+    "pointer_sha256_before": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "pointer_sha256_after": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "flow_run_id": "e580d753-0090-4ef8-b0a7-9161cdc7f55e",
+    "prepared": false,
+    "cache_hit": true
+  },
+  {
+    "name": "08-foreign",
+    "command": [
+      "/Users/ralolaev/bmstu/MLOps/.venv/bin/python3",
+      "/Users/ralolaev/bmstu/MLOps/lab.py",
+      "--workspace",
+      "/Users/ralolaev/bmstu/MLOps/deployments/planner",
+      "run",
+      "--manifest",
+      "manifest-baseline.json",
+      "--report",
+      "negative-foreign.json"
+    ],
+    "exit_code": 1,
+    "pointer_sha256_before": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "pointer_sha256_after": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "flow_run_id": "37af9694-30c8-4fac-9b35-42b0adb75fa0",
+    "prepared": false,
+    "cache_hit": true
+  },
+  {
+    "name": "09-nan",
+    "command": [
+      "/Users/ralolaev/bmstu/MLOps/.venv/bin/python3",
+      "/Users/ralolaev/bmstu/MLOps/lab.py",
+      "--workspace",
+      "/Users/ralolaev/bmstu/MLOps/deployments/planner",
+      "run",
+      "--manifest",
+      "manifest-baseline.json",
+      "--report",
+      "negative-nan.json"
+    ],
+    "exit_code": 1,
+    "pointer_sha256_before": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "pointer_sha256_after": "fe713a8644049fc354fc944fb86654d0b39d307d8d0fc8c1e345af30cfa8a619",
+    "flow_run_id": "ca9f1a46-7c4b-4bbb-a430-432366b39608",
+    "prepared": false,
+    "cache_hit": true
+  }
+]

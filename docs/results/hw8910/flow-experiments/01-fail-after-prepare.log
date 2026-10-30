@@ -1,0 +1,57 @@
+FLOW_RUN_ID 4c85aeeb-698a-4ce1-abe6-5dc4bf9c90bf
+PREPARED eedfd8a3ad55062d023e00d8d2c48db58447054f6bcae99cec96d318c9b8e446
+PREPARE_TASK_STATE Completed
+
+20:05:44.346 | INFO    | Flow run 'attentive-caterpillar' - Beginning flow run 'attentive-caterpillar' for flow 'planner-release'
+20:05:44.350 | INFO    | Flow run 'attentive-caterpillar' - View at http://127.0.0.1:4208/runs/flow-run/4c85aeeb-698a-4ce1-abe6-5dc4bf9c90bf
+20:05:44.400 | INFO    | Task run 'validate-input-dff' - Finished in state Completed()
+20:05:45.357 | ERROR   | Flow run 'attentive-caterpillar' - Encountered exception during execution: RuntimeError('Инъекция сбоя после подготовки')
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/flow_engine.py", line 1330, in run_context
+    yield self
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/flow_engine.py", line 2111, in run_flow_sync
+    engine.call_flow_fn()
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/flow_engine.py", line 1350, in call_flow_fn
+    result = call_with_parameters(self.flow.fn, self.parameters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/utilities/callables/__init__.py", line 356, in call_with_parameters
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/ralolaev/bmstu/MLOps/src/release_flow.py", line 81, in release_flow
+    raise RuntimeError('Инъекция сбоя после подготовки')
+RuntimeError: Инъекция сбоя после подготовки
+20:05:45.370 | INFO    | Flow run 'attentive-caterpillar' - Finished in state Failed('Flow run encountered an exception: RuntimeError: Инъекция сбоя после подготовки')
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/lab.py", line 98, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/ralolaev/bmstu/MLOps/lab.py", line 95, in main
+    else:run(args.workspace,args.report,args.fail_after_prepare,args.manifest,args.fail_after_pointer)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ralolaev/bmstu/MLOps/lab.py", line 68, in run
+    return release_flow(str(root), manifest_name, report_name, fail_after_prepare, fail_after_pointer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/flows.py", line 1887, in __call__
+    return run_flow(
+           ^^^^^^^^^
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/flow_engine.py", line 2268, in run_flow
+    ret_val = run_flow_sync(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/flow_engine.py", line 2113, in run_flow_sync
+    return engine.state if return_type == "state" else engine.result()
+                                                       ^^^^^^^^^^^^^^^
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/flow_engine.py", line 788, in result
+    raise self._raised
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/flow_engine.py", line 1330, in run_context
+    yield self
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/flow_engine.py", line 2111, in run_flow_sync
+    engine.call_flow_fn()
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/flow_engine.py", line 1350, in call_flow_fn
+    result = call_with_parameters(self.flow.fn, self.parameters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ralolaev/bmstu/MLOps/.venv/lib/python3.12/site-packages/prefect/utilities/callables/__init__.py", line 356, in call_with_parameters
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/ralolaev/bmstu/MLOps/src/release_flow.py", line 81, in release_flow
+    raise RuntimeError('Инъекция сбоя после подготовки')
+RuntimeError: Инъекция сбоя после подготовки

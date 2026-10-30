@@ -1,0 +1,3 @@
+{"event": "subprocess", "arguments": ["init"], "returncode": 0, "stdout": "Создан синтетический стенд: /var/folders/xh/jrybb67s67v2xqlzvqcbyz780000gn/T/tmpsgpdaenl/workspace\n", "stderr": "", "pointer_sha256_before": null, "pointer_sha256_after": "aca0bc1332936349f868b84d800dec94e1a042f4aec3196fe4c4c031c3b5c6d1"}
+{"event": "atomic-write-injection", "returncode": 1, "stdout": "", "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 11, in <module>\nAssertionError: Ожидалась ошибка атомарной замены\n"}
+{"event": "atomic-file-after", "pointer_sha256": "0bb6ec1a07f2c71016d90b62af8865121cb2b7b4bc8d6cd5d0336af99ad0a7d3", "temporary_files": []}

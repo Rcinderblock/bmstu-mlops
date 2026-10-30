@@ -1,0 +1,99 @@
+test_atomic_failure_preserves_real_file_bytes (test_integration.IncidentIntegrationTests.test_atomic_failure_preserves_real_file_bytes) ... FAIL
+test_cache_recovery_and_changed_bytes_in_new_process (test_integration.IncidentIntegrationTests.test_cache_recovery_and_changed_bytes_in_new_process) ... FAIL
+test_http_identity_restart_and_rollback (test_integration.IncidentIntegrationTests.test_http_identity_restart_and_rollback) ... FAIL
+test_http_readiness_waits_for_warmup (test_integration.IncidentIntegrationTests.test_http_readiness_waits_for_warmup) ... FAIL
+test_http_validation_does_not_call_backend (test_integration.IncidentIntegrationTests.test_http_validation_does_not_call_backend) ... FAIL
+test_identical_publication_and_repair_after_pointer_crash (test_integration.IncidentIntegrationTests.test_identical_publication_and_repair_after_pointer_crash) ... FAIL
+test_incomplete_and_foreign_reports_preserve_pointer (test_integration.IncidentIntegrationTests.test_incomplete_and_foreign_reports_preserve_pointer) ...
+  test_incomplete_and_foreign_reports_preserve_pointer (test_integration.IncidentIntegrationTests.test_incomplete_and_foreign_reports_preserve_pointer) (report='report-incomplete.json') ... FAIL
+  test_incomplete_and_foreign_reports_preserve_pointer (test_integration.IncidentIntegrationTests.test_incomplete_and_foreign_reports_preserve_pointer) (report='report-A.json') ... FAIL
+  test_incomplete_and_foreign_reports_preserve_pointer (test_integration.IncidentIntegrationTests.test_incomplete_and_foreign_reports_preserve_pointer) (report='report-reject.json') ... FAIL
+
+======================================================================
+FAIL: test_atomic_failure_preserves_real_file_bytes (test_integration.IncidentIntegrationTests.test_atomic_failure_preserves_real_file_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_integration.py", line 163, in test_atomic_failure_preserves_real_file_bytes
+    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "<string>", line 11, in <module>
+AssertionError: Ожидалась ошибка атомарной замены
+
+
+======================================================================
+FAIL: test_cache_recovery_and_changed_bytes_in_new_process (test_integration.IncidentIntegrationTests.test_cache_recovery_and_changed_bytes_in_new_process)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_integration.py", line 113, in test_cache_recovery_and_changed_bytes_in_new_process
+    self.assertIn('PREPARED', changed.stdout + changed.stderr)
+AssertionError: 'PREPARED' not found in 'CACHE_HIT 88bbd559a04a7a432693a1c611ef2704bb711ac17dd5e22203ee9e5020f59fd4\nPUBLISHED fixture-B\n'
+
+======================================================================
+FAIL: test_http_identity_restart_and_rollback (test_integration.IncidentIntegrationTests.test_http_identity_restart_and_rollback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_integration.py", line 184, in test_http_identity_restart_and_rollback
+    self.assertEqual(old['model_id'], 'fixture-A', 'Указатель B не загрузил веса B в память')
+AssertionError: 'fixture-B' != 'fixture-A'
+- fixture-B
+?         ^
++ fixture-A
+?         ^
+ : Указатель B не загрузил веса B в память
+
+======================================================================
+FAIL: test_http_readiness_waits_for_warmup (test_integration.IncidentIntegrationTests.test_http_readiness_waits_for_warmup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_integration.py", line 169, in test_http_readiness_waits_for_warmup
+    self.assertEqual(self.call('/ready')[0], 503)
+AssertionError: 200 != 503
+
+======================================================================
+FAIL: test_http_validation_does_not_call_backend (test_integration.IncidentIntegrationTests.test_http_validation_does_not_call_backend)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_integration.py", line 206, in test_http_validation_does_not_call_backend
+    self.assertTrue(400 <= status < 500, (request, status))
+AssertionError: False is not true : ({'prompt': '', 'max_new_tokens': 32}, 200)
+
+======================================================================
+FAIL: test_identical_publication_and_repair_after_pointer_crash (test_integration.IncidentIntegrationTests.test_identical_publication_and_repair_after_pointer_crash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_integration.py", line 129, in test_identical_publication_and_repair_after_pointer_crash
+    self.assertEqual(len(events), 1, 'Один выпуск B размножился в разных процессах')
+AssertionError: 2 != 1 : Один выпуск B размножился в разных процессах
+
+======================================================================
+FAIL: test_incomplete_and_foreign_reports_preserve_pointer (test_integration.IncidentIntegrationTests.test_incomplete_and_foreign_reports_preserve_pointer) (report='report-incomplete.json')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_integration.py", line 121, in test_incomplete_and_foreign_reports_preserve_pointer
+    self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+AssertionError: 0 == 0 : PREPARED 88bbd559a04a7a432693a1c611ef2704bb711ac17dd5e22203ee9e5020f59fd4
+PUBLISHED fixture-B
+
+
+======================================================================
+FAIL: test_incomplete_and_foreign_reports_preserve_pointer (test_integration.IncidentIntegrationTests.test_incomplete_and_foreign_reports_preserve_pointer) (report='report-A.json')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_integration.py", line 121, in test_incomplete_and_foreign_reports_preserve_pointer
+    self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+AssertionError: 0 == 0 : CACHE_HIT 88bbd559a04a7a432693a1c611ef2704bb711ac17dd5e22203ee9e5020f59fd4
+PUBLISHED fixture-B
+
+
+======================================================================
+FAIL: test_incomplete_and_foreign_reports_preserve_pointer (test_integration.IncidentIntegrationTests.test_incomplete_and_foreign_reports_preserve_pointer) (report='report-reject.json')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw8910/test_integration.py", line 122, in test_incomplete_and_foreign_reports_preserve_pointer
+    self.assertEqual((self.root / 'accepted.json').read_bytes(), before)
+AssertionError: b'{\n[42 chars]ture-B",\n  "artifact_uri": "model-B.txt",\n  [814 chars]}\n}' != b'{\n[42 chars]ture-A",\n  "artifact_uri": "model-A.txt",\n  [814 chars]}\n}'
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.880s
+
+FAILED (failures=9)

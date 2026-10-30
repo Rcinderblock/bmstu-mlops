@@ -1,0 +1,5 @@
+{"event": "subprocess", "arguments": ["init"], "returncode": 0, "stdout": "Создан синтетический стенд: /var/folders/xh/jrybb67s67v2xqlzvqcbyz780000gn/T/tmplh9ic14g/workspace\n", "stderr": "", "pointer_sha256_before": null, "pointer_sha256_after": "aca0bc1332936349f868b84d800dec94e1a042f4aec3196fe4c4c031c3b5c6d1"}
+{"event": "http", "path": "/health", "payload": null, "status": 200, "response": {"alive": true, "backend": "STUB ONLY"}}
+{"event": "http", "path": "/health", "payload": null, "status": 200, "response": {"alive": true, "backend": "STUB ONLY"}}
+{"event": "http", "path": "/debug", "payload": null, "status": 200, "response": {"loaded_id": "fixture-A", "calls": 0, "warmup_finished": false}}
+{"event": "http", "path": "/ready", "payload": null, "status": 200, "response": {"ready": true}}
