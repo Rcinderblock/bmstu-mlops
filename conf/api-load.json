@@ -1,0 +1,14 @@
+{
+  "max_new_tokens": 32,
+  "concurrency": [1, 2],
+  "requests": [
+    {"id": "alarm-set", "prompt": "поставь будильник на семь утра"},
+    {"id": "alarm-query", "prompt": "покажи список включённых будильников"},
+    {"id": "calendar-query", "prompt": "что у меня запланировано на завтра"},
+    {"id": "calendar-set", "prompt": "напомни завтра в девять позвонить маме"},
+    {"id": "lists-add", "prompt": "добавь чай в список для поездки"},
+    {"id": "lists-query", "prompt": "покажи мой список покупок"},
+    {"id": "lists-remove", "prompt": "удали батарейки из списка покупок"},
+    {"id": "refusal", "prompt": "объясни почему вода в море солёная"}
+  ]
+}

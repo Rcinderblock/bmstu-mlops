@@ -1,11 +1,8 @@
-"""Исполняемый прототип для расследования. Только синтетические данные, без модели.
-
-Запускайте в отдельном каталоге .lab. Этот последовательный прототип надо
-превратить в корректный Prefect-flow; его зелёный статус не доказывает корректность.
-"""
+"""Совместимый запуск стенда и процесса Prefect; init создаёт только STUB ONLY."""
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import release
 
@@ -39,10 +36,12 @@ def initialize(root):
            'artifact_uri':artifact.name,'model_sha256':digest(canonical(files)),
            'protocol_sha256':'d'*64,'golden_sha256':'e'*64,
            'runtime_sha256':digest(canonical(runtime)),'runtime':runtime,'file_hashes':files}
+        m.update(backend='stub', synthetic=True)
         report={k:m[k] for k in ['model_id','model_sha256','protocol_sha256','golden_sha256','runtime_sha256']}
         report.update(status='complete',passed=True,evaluation_run_id=f'fixture-eval-{version}',metrics={'accuracy':.8,'format_rate':1.0},synthetic=True)
         write(root/f'manifest-{version}.json',m);write(root/f'report-{version}.json',report)
     write(root/'accepted.json',read(root/'manifest-A.json'))
+    write(root/'initial-accepted.json',read(root/'manifest-A.json'))
     report=read(root/'report-B.json');report['status']='running';report['passed']='false'
     write(root/'report-incomplete.json',report)
     report=read(root/'report-B.json');report['passed']=False
@@ -53,32 +52,49 @@ def initialize(root):
 
 
 def prepare(root):
-    config=read(root/'config.json');key=release.cache_key(root/'input.txt',config)
-    cache=root/'cache';cache.mkdir(exist_ok=True);entry=cache/(key+'.json')
-    if entry.exists():
-        result=read(entry);print('CACHE_HIT',result['input_sha256']);return result
-    payload=(root/'input.txt').read_bytes()
-    result={'input_sha256':digest(payload),'rows':len(payload.splitlines()),'config':config}
-    write(entry,result);print('PREPARED',result['input_sha256']);return result
+    from src.deployment import prepare as prepare_input
+    return prepare_input(root)
 
 
-def run(root,report_name,fail_after_prepare=False):
-    prepared=prepare(root)
-    if fail_after_prepare:raise RuntimeError('Инъекция сбоя после подготовки')
-    manifest=read(root/'manifest-B.json');report=read(root/report_name)
-    release.publish(manifest,report,root/'accepted.json')
-    with (root/'publications.jsonl').open('a') as f:
-        f.write(json.dumps({'model_id':manifest['model_id'],'prepared':prepared['input_sha256']})+'\n')
-    print('PUBLISHED',manifest['model_id'])
+def run(root, report_name, fail_after_prepare=False, manifest_name='manifest-B.json',
+        fail_after_pointer=False):
+    os.environ.setdefault('PREFECT_HOME', str(Path(__file__).resolve().parent / '.prefect'))
+    os.environ.setdefault('PREFECT_API_URL', 'http://127.0.0.1:4208/api')
+    from urllib.parse import urlparse
+    if urlparse(os.environ['PREFECT_API_URL']).hostname not in ('localhost', '127.0.0.1', '::1'):
+        raise ValueError('Эта работа использует локальный сервер Prefect')
+    os.environ['PREFECT_SERVER_ANALYTICS_ENABLED'] = 'false'
+    from src.prefect_local import local_prefect
+    with local_prefect():
+        from src.release_flow import release_flow
+        return release_flow(str(root), manifest_name, report_name, fail_after_prepare, fail_after_pointer)
+
+
+def rollback(root, manifest_name, report_name):
+    from src.deployment import database
+    manifest = read(root / manifest_name)
+    prior = [read(root / 'initial-accepted.json')] if (root / 'initial-accepted.json').exists() else []
+    with database(root) as conn:
+        prior.extend(json.loads(row[0]) for row in conn.execute("SELECT manifest FROM releases WHERE state='committed'"))
+    keys = ('model_id', 'model_sha256', 'runtime_sha256')
+    if not any(all(old.get(k) == manifest.get(k) for k in keys) for old in prior):
+        raise ValueError('Откат разрешён только к ранее принятой версии')
+    return run(root, report_name, manifest_name=manifest_name)
 
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--workspace',type=Path,default=Path('.lab'))
     sub=parser.add_subparsers(dest='command',required=True);sub.add_parser('init')
     run_parser=sub.add_parser('run');run_parser.add_argument('--report',default='report-B.json');run_parser.add_argument('--fail-after-prepare',action='store_true')
+    run_parser.add_argument('--manifest', default='manifest-B.json')
+    run_parser.add_argument('--fail-after-pointer', action='store_true')
+    back = sub.add_parser('rollback')
+    back.add_argument('--manifest', required=True);back.add_argument('--report', required=True)
     args=parser.parse_args()
     if args.command=='init':initialize(args.workspace)
-    else:run(args.workspace,args.report,args.fail_after_prepare)
+    elif args.command == 'rollback':
+        rollback(args.workspace,args.manifest,args.report)
+    else:run(args.workspace,args.report,args.fail_after_prepare,args.manifest,args.fail_after_pointer)
 
 
 if __name__=='__main__':main()

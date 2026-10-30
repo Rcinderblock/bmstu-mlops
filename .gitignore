@@ -37,3 +37,7 @@ params.yaml.orig
 /mlartifacts/
 /volumes/
 /.pytest_cache/
+/.prefect/
+/.lab*/
+/deployments/
+/artifacts/

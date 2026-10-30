@@ -1,0 +1,30 @@
+{
+  "url": "https://github.com/Rcinderblock/bmstu-mlops/releases/download/release-inputs-v1/release-inputs-v1.zip",
+  "sha256": "23b34af251f1ea11c74afb420d7bd92b76a0569c53ad9ad2eb3523e979db7183",
+  "bytes": 138938,
+  "files": [
+    "manifest-baseline.json",
+    "manifest-candidate.json",
+    "release-report-baseline.json",
+    "release-report-candidate.json",
+    "input.txt",
+    "config.json",
+    "tokenizer-equivalence.json",
+    "evidence/baseline-eval.json",
+    "evidence/baseline-outputs.json",
+    "evidence/baseline-spec.json",
+    "evidence/behavioral.jsonl",
+    "evidence/candidate-eval.json",
+    "evidence/candidate-outputs.json",
+    "evidence/candidate-spec.json",
+    "evidence/evaluation-code/__init__.py",
+    "evidence/evaluation-code/cli.py",
+    "evidence/evaluation-code/contract.py",
+    "evidence/evaluation-code/solution.py",
+    "evidence/golden.jsonl",
+    "evidence/origin.json",
+    "evidence/params.json",
+    "evidence/training-index.jsonl",
+    "LICENSE-data.txt"
+  ]
+}
