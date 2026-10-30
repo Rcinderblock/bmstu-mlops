@@ -1,4 +1,4 @@
-.PHONY: install check check-release check-negative check-eval test test-legacy prefect release-init release-restore release release-reject api api-bench release-reevaluate up down
+.PHONY: install check check-release check-negative check-eval test test-legacy prefect release-init release-restore release release-reject api api-smoke api-bench release-reevaluate up down
 install:
 	uv sync --frozen
 check: check-release
@@ -25,6 +25,8 @@ release-reevaluate:
 	uv run --locked python scripts/reevaluate_release.py
 api:
 	HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 uv run --locked python service.py --workspace deployments/planner --port 8091
+api-smoke:
+	curl -fsS http://127.0.0.1:8091/generate --json '{"prompt":"поставь будильник на семь утра","max_new_tokens":32}' | python3 -m json.tool
 api-bench:
 	HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 uv run --locked python scripts/benchmark_api.py --out notes/work/hw08-09-10/api-$(shell date +%Y%m%d-%H%M%S)
 up:

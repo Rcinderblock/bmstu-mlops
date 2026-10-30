@@ -50,9 +50,37 @@
 
 Байты входа + tokenizer_revision + template_sha256 + max_length + code_revision + фактический SHA обработки. Результаты на диске. Новый процесс: Cached. Изменение вопроса по прежнему пути: PREPARED и отказ из-за несовместимой оценки.
 
+Выдержки из сохранённых запусков, полные журналы — `docs/results/hw8910/flow-experiments/`:
+
+```text
+01-fail-after-prepare
+PREPARED eedfd8a3ad55062d023e00d8d2c48db58447054f6bcae99cec96d318c9b8e446
+PREPARE_TASK_STATE Completed
+
+02-resume-new-process
+PREPARE_TASK_STATE Cached
+CACHE_HIT eedfd8a3ad55062d023e00d8d2c48db58447054f6bcae99cec96d318c9b8e446
+
+04-change-input-same-path
+PREPARED c017feea0df89ac417f9a46317fec9089f89d38f480270260674b4674e436954
+PREPARE_TASK_STATE Completed
+```
+
 ## Публикация
 
 accepted.json: temp → flush/fsync → os.replace. attempts.jsonl: все попытки. SQLite: уникальные выпуски, pending/committed. publications.jsonl: восстанавливаемая проекция. Один писатель. Один успешный выпуск baseline, повтор не добавил событие. Сбой после указателя проверен на STUB и восстановлен.
+
+```text
+STUB ONLY — сохранённый опыт в отдельном процессе
+FLOW_RUN_ID fb8f1934-318c-43d6-9a93-0e12b618c288
+RECOVERED_PUBLICATION 55c008643a124c52044ab2a2ca815a85982390552aa2106d7675104331776afb
+PREPARE_TASK_STATE Cached
+CACHE_HIT 88bbd559a04a7a432693a1c611ef2704bb711ac17dd5e22203ee9e5020f59fd4
+PUBLISHED fixture-B 55c008643a124c52044ab2a2ca815a85982390552aa2106d7675104331776afb
+
+число восстановленных событий: 1
+model_id: fixture-B
+```
 
 ## Допуск
 
@@ -97,6 +125,16 @@ accepted.json: temp → flush/fsync → os.replace. attempts.jsonl: все по�
 ## Версии
 
 STUB ONLY: загрузить A → опубликовать B → ответ всё ещё A → перезапустить → B → откатить к принятой A → до перезапуска B → после перезапуска A. Настоящая база отдельно загружена повторно с тем же ID/runtime.
+
+Сохранённые реальные HTTP-ответы стенда `STUB ONLY`:
+
+| Событие | HTTP | ID из памяти | Номер запроса |
+|---|---|---|---|
+| После загрузки A | 200 | fixture-A | c168925e-d427-44b6-b9ef-c4c3679eeed2 |
+| После публикации B, до перезапуска | 200 | fixture-A | aeeaca6e-570a-4387-9961-5d58fc0f65e1 |
+| После перезапуска | 200 | fixture-B | 4d7c298f-cf03-4fcb-b76f-16c662324d16 |
+| После отката к A, до перезапуска | 200 | fixture-B | bca1caf3-5c7b-4475-ab4b-d0f88e9a5869 |
+| После следующего перезапуска | 200 | fixture-A | a4f100be-2c7e-4789-b2fd-6a224e041ba0 |
 
 ## Нагрузка
 

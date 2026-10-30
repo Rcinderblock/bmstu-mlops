@@ -1,0 +1,12 @@
+uv run --locked python lab.py --workspace deployments/planner run --manifest manifest-baseline.json --report release-report-baseline.json
+20:39:01.872 | INFO    | Flow run 'hissing-swan' - Beginning flow run 'hissing-swan' for flow 'planner-release'
+20:39:01.876 | INFO    | Flow run 'hissing-swan' - View at http://127.0.0.1:4208/runs/flow-run/60373366-d29f-455c-9256-efbfafd66a3c
+FLOW_RUN_ID 60373366-d29f-455c-9256-efbfafd66a3c
+20:39:01.929 | INFO    | Task run 'validate-input-d99' - Finished in state Cached(type=COMPLETED)
+PREPARE_TASK_STATE Cached
+CACHE_HIT eedfd8a3ad55062d023e00d8d2c48db58447054f6bcae99cec96d318c9b8e446
+20:39:02.683 | INFO    | Task run 'retrieve-artifact-222' - Finished in state Completed()
+20:39:02.712 | INFO    | Task run 'evaluate-release-3f2' - Finished in state Completed()
+PUBLISHED planner-baseline-c1899de289a0 41a84316f008bda10a36aa605136cee055018a005a82d41dc947a03d0d04149c
+20:39:03.501 | INFO    | Task run 'publish-accepted-ce8' - Finished in state Completed()
+20:39:03.888 | INFO    | Flow run 'hissing-swan' - Finished in state Completed()

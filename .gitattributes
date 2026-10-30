@@ -1,2 +1,3 @@
 # В сохранённом unified diff пробел обозначает пустую строку контекста.
 /docs/results/hw8910/fixes.patch -whitespace
+/docs/results/hw8910/screen-demo/recorded-make-check-negative.log -whitespace

@@ -1,0 +1,13 @@
+curl -fsS http://127.0.0.1:8091/generate --json '{"prompt":"поставь будильник на семь утра","max_new_tokens":32}' | python3 -m json.tool
+{
+    "answer": "{\"answer\": \"alarm_set\"}",
+    "output_tokens": 8,
+    "input_tokens": 261,
+    "generation_seconds": 0.5253199170110747,
+    "model_id": "planner-baseline-c1899de289a0",
+    "runtime_sha256": "1c6c5cd2f5c9a3688e81cc8a55b4e251975b93fcc1c1b0649c6d6ed38e4a49c4",
+    "request_id": "862e74cb-3f9b-414e-a09e-6540a9352321",
+    "queue_seconds": 4.375004209578037e-06,
+    "service_seconds": 0.5319899580208585,
+    "backend": "transformers"
+}

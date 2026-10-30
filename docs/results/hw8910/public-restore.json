@@ -1,0 +1,22 @@
+{
+  "checked_at": "2026-10-30T17:36:07.470135+00:00",
+  "command": "HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 uv run python scripts/restore_release.py --workspace notes/work/hw08-09-10/public-restore-check-2",
+  "exit_code": 0,
+  "download_authenticated": false,
+  "url": "https://github.com/Rcinderblock/bmstu-mlops/releases/download/release-inputs-v1/release-inputs-v1.zip",
+  "archive_sha256": "23b34af251f1ea11c74afb420d7bd92b76a0569c53ad9ad2eb3523e979db7183",
+  "verified_model_id": "planner-baseline-c1899de289a0",
+  "runtime_sha256": "1c6c5cd2f5c9a3688e81cc8a55b4e251975b93fcc1c1b0649c6d6ed38e4a49c4",
+  "model_files": {
+    "chat_template.jinja": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+    "config.json": "660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd",
+    "generation_config.json": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+    "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+    "model.safetensors": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "full_bound_report_verified": true,
+  "scope": "Публичный текстовый архив; точные веса восстановлены из ранее загруженного HF-кеша. Повторное скачивание больших весов по сети не выполнялось."
+}

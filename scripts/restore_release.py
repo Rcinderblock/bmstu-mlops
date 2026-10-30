@@ -19,7 +19,9 @@ with zipfile.ZipFile(io.BytesIO(raw)) as z:
  z.extractall(root)
 m=json.loads((root/'manifest-baseline.json').read_text())
 from huggingface_hub import snapshot_download
-source=Path(snapshot_download(m['runtime']['base_name'],revision=m['runtime']['base_revision']))
+source=Path(snapshot_download(m['runtime']['base_name'],revision=m['runtime']['base_revision'],
+ local_files_only=os.environ.get('HF_HUB_OFFLINE')=='1',
+ allow_patterns=[name for name in m['file_hashes'] if name!='chat_template.jinja']))
 artifact=root/m['artifact_dir'];artifact.mkdir(parents=True)
 for name in m['file_hashes']:
  target=artifact/name
