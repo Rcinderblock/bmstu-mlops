@@ -1,0 +1,34 @@
+{
+  "docker_server": "29.2.0",
+  "kind": "kind v0.30.0 go1.24.6 darwin/arm64",
+  "helm": "v3.19.0+g3d8990f",
+  "kubernetes": {
+    "clientVersion": {
+      "major": "1",
+      "minor": "34",
+      "gitVersion": "v1.34.1",
+      "gitCommit": "93248f9ae092f571eb870b7664c534bfc7d00f03",
+      "gitTreeState": "clean",
+      "buildDate": "2025-09-09T19:44:50Z",
+      "goVersion": "go1.24.6",
+      "compiler": "gc",
+      "platform": "darwin/arm64"
+    },
+    "kustomizeVersion": "v5.7.1",
+    "serverVersion": {
+      "major": "1",
+      "minor": "34",
+      "emulationMajor": "1",
+      "emulationMinor": "34",
+      "minCompatibilityMajor": "1",
+      "minCompatibilityMinor": "33",
+      "gitVersion": "v1.34.0",
+      "gitCommit": "f28b4c9efbca5c5c0af716d9f2d5702667ee8a45",
+      "gitTreeState": "clean",
+      "buildDate": "2025-08-27T10:09:04Z",
+      "goVersion": "go1.24.6",
+      "compiler": "gc",
+      "platform": "linux/arm64"
+    }
+  }
+}

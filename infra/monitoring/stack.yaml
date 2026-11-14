@@ -90,58 +90,60 @@ data:
     ,\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 8,\n        \"w\":\
     \ 12,\n        \"h\": 8\n      },\n      \"datasource\": {\n        \"type\":\
     \ \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"targets\"\
-    : [\n        {\n          \"expr\": \"planner_running or planner_waiting\",\n\
-    \          \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n      ],\n  \
-    \    \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"short\"\
-    \n        },\n        \"overrides\": []\n      }\n    },\n    {\n      \"id\"\
-    : 4,\n      \"type\": \"timeseries\",\n      \"title\": \"Завершений в секунду\"\
-    ,\n      \"gridPos\": {\n        \"x\": 12,\n        \"y\": 8,\n        \"w\"\
-    : 12,\n        \"h\": 8\n      },\n      \"datasource\": {\n        \"type\":\
-    \ \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"targets\"\
-    : [\n        {\n          \"expr\": \"sum by(pod) (rate(planner_requests_total{outcome=\\\
+    : [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"planner_running\"\
+    ,\n          \"legendFormat\": \"running {{pod}}\"\n        },\n        {\n  \
+    \        \"refId\": \"B\",\n          \"expr\": \"planner_waiting\",\n       \
+    \   \"legendFormat\": \"waiting {{pod}}\"\n        }\n      ],\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"unit\": \"short\"\n        },\n    \
+    \    \"overrides\": []\n      }\n    },\n    {\n      \"id\": 4,\n      \"type\"\
+    : \"timeseries\",\n      \"title\": \"Завершений в секунду\",\n      \"gridPos\"\
+    : {\n        \"x\": 12,\n        \"y\": 8,\n        \"w\": 12,\n        \"h\"\
+    : 8\n      },\n      \"datasource\": {\n        \"type\": \"prometheus\",\n  \
+    \      \"uid\": \"prometheus\"\n      },\n      \"targets\": [\n        {\n  \
+    \        \"expr\": \"sum by(pod) (rate(planner_requests_total{outcome=\\\"completed\\\
+    \"}[30s]))\",\n          \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n\
+    \      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\"\
+    : \"reqps\"\n        },\n        \"overrides\": []\n      }\n    },\n    {\n \
+    \     \"id\": 5,\n      \"type\": \"timeseries\",\n      \"title\": \"Отказы и\
+    \ обрывы /с\",\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 16,\n\
+    \        \"w\": 12,\n        \"h\": 8\n      },\n      \"datasource\": {\n   \
+    \     \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n \
+    \     \"targets\": [\n        {\n          \"expr\": \"sum by(pod,outcome) (rate(planner_requests_total{outcome!=\\\
     \"completed\\\"}[30s]))\",\n          \"legendFormat\": \"{{pod}} {{outcome}}\"\
     \n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n   \
     \       \"unit\": \"reqps\"\n        },\n        \"overrides\": []\n      }\n\
-    \    },\n    {\n      \"id\": 5,\n      \"type\": \"timeseries\",\n      \"title\"\
-    : \"Отказы и обрывы /с\",\n      \"gridPos\": {\n        \"x\": 0,\n        \"\
+    \    },\n    {\n      \"id\": 6,\n      \"type\": \"timeseries\",\n      \"title\"\
+    : \"CPU процесса, ядер\",\n      \"gridPos\": {\n        \"x\": 12,\n        \"\
     y\": 16,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"datasource\"\
     : {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n    \
-    \  },\n      \"targets\": [\n        {\n          \"expr\": \"sum by(pod,outcome)\
-    \ (rate(planner_requests_total{outcome!=\\\"completed\\\"}[30s]))\",\n       \
-    \   \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n      ],\n      \"fieldConfig\"\
-    : {\n        \"defaults\": {\n          \"unit\": \"reqps\"\n        },\n    \
-    \    \"overrides\": []\n      }\n    },\n    {\n      \"id\": 6,\n      \"type\"\
-    : \"timeseries\",\n      \"title\": \"CPU процесса, ядер\",\n      \"gridPos\"\
-    : {\n        \"x\": 12,\n        \"y\": 16,\n        \"w\": 12,\n        \"h\"\
-    : 8\n      },\n      \"datasource\": {\n        \"type\": \"prometheus\",\n  \
-    \      \"uid\": \"prometheus\"\n      },\n      \"targets\": [\n        {\n  \
-    \        \"expr\": \"rate(process_cpu_seconds_total[30s])\",\n          \"legendFormat\"\
-    : \"{{pod}} {{outcome}}\"\n        }\n      ],\n      \"fieldConfig\": {\n   \
-    \     \"defaults\": {\n          \"unit\": \"short\"\n        },\n        \"overrides\"\
-    : []\n      }\n    },\n    {\n      \"id\": 7,\n      \"type\": \"timeseries\"\
-    ,\n      \"title\": \"RSS процесса, байт\",\n      \"gridPos\": {\n        \"\
-    x\": 0,\n        \"y\": 24,\n        \"w\": 12,\n        \"h\": 8\n      },\n\
-    \      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\":\
-    \ \"prometheus\"\n      },\n      \"targets\": [\n        {\n          \"expr\"\
-    : \"process_resident_memory_bytes\",\n          \"legendFormat\": \"{{pod}} {{outcome}}\"\
-    \n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n   \
-    \       \"unit\": \"bytes\"\n        },\n        \"overrides\": []\n      }\n\
-    \    },\n    {\n      \"id\": 8,\n      \"type\": \"timeseries\",\n      \"title\"\
-    : \"Прогретых реплик\",\n      \"gridPos\": {\n        \"x\": 12,\n        \"\
-    y\": 24,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"datasource\"\
-    : {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n    \
-    \  },\n      \"targets\": [\n        {\n          \"expr\": \"sum(planner_ready)\"\
+    \  },\n      \"targets\": [\n        {\n          \"expr\": \"rate(process_cpu_seconds_total[30s])\"\
     ,\n          \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n      ],\n\
     \      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"short\"\
     \n        },\n        \"overrides\": []\n      }\n    },\n    {\n      \"id\"\
-    : 9,\n      \"type\": \"timeseries\",\n      \"title\": \"Очередь p95, с\",\n\
-    \      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 32,\n        \"w\": 12,\n\
+    : 7,\n      \"type\": \"timeseries\",\n      \"title\": \"RSS процесса, байт\"\
+    ,\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 24,\n        \"w\"\
+    : 12,\n        \"h\": 8\n      },\n      \"datasource\": {\n        \"type\":\
+    \ \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"targets\"\
+    : [\n        {\n          \"expr\": \"process_resident_memory_bytes\",\n     \
+    \     \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n      ],\n      \"\
+    fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"bytes\"\n   \
+    \     },\n        \"overrides\": []\n      }\n    },\n    {\n      \"id\": 8,\n\
+    \      \"type\": \"timeseries\",\n      \"title\": \"Прогретых реплик\",\n   \
+    \   \"gridPos\": {\n        \"x\": 12,\n        \"y\": 24,\n        \"w\": 12,\n\
     \        \"h\": 8\n      },\n      \"datasource\": {\n        \"type\": \"prometheus\"\
     ,\n        \"uid\": \"prometheus\"\n      },\n      \"targets\": [\n        {\n\
-    \          \"expr\": \"histogram_quantile(0.95, sum by(le,pod) (rate(planner_queue_seconds_bucket[30s])))\"\
-    ,\n          \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n      ],\n\
-    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"s\"\n\
-    \        },\n        \"overrides\": []\n      }\n    }\n  ]\n}"
+    \          \"expr\": \"sum(planner_ready)\",\n          \"legendFormat\": \"{{pod}}\
+    \ {{outcome}}\"\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"unit\": \"short\"\n        },\n        \"overrides\": []\n  \
+    \    }\n    },\n    {\n      \"id\": 9,\n      \"type\": \"timeseries\",\n   \
+    \   \"title\": \"Очередь p95, с\",\n      \"gridPos\": {\n        \"x\": 0,\n\
+    \        \"y\": 32,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"\
+    datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\
+    \n      },\n      \"targets\": [\n        {\n          \"expr\": \"histogram_quantile(0.95,\
+    \ sum by(le,pod) (rate(planner_queue_seconds_bucket[30s])))\",\n          \"legendFormat\"\
+    : \"{{pod}} {{outcome}}\"\n        }\n      ],\n      \"fieldConfig\": {\n   \
+    \     \"defaults\": {\n          \"unit\": \"s\"\n        },\n        \"overrides\"\
+    : []\n      }\n    }\n  ]\n}"
 ---
 apiVersion: apps/v1
 kind: Deployment

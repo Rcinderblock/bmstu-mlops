@@ -1,5 +1,5 @@
 from pathlib import Path
-import json,time,threading,urllib.request,sys
+import argparse,json,time,threading,urllib.request,sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from common import k,obj,helm,wait_ready,pods,ROOT
 import run_balance as load
@@ -25,7 +25,10 @@ def wait_minimum(name):
   time.sleep(5)
  raise RuntimeError('HPA не вернулся к минимуму: сохранён фактический журнал')
 def main():
- load.OUT=OUT
+ global OUT
+ p=argparse.ArgumentParser();p.add_argument('--out',type=Path,default=OUT);args=p.parse_args();OUT=args.out.resolve();OUT.mkdir(parents=True,exist_ok=True)
+ if any(OUT.iterdir()):raise FileExistsError('Для повторного опыта выберите новый --out')
+ load.OUT=OUT;load.SCENARIO_PREFIX='c-'
  helm(modelVersion='A',cacheHitCpuMs=80,cacheMissCpuMs=80);wait_ready();time.sleep(20)
  helm(modelVersion='A',cacheHitCpuMs=80,cacheMissCpuMs=80,**{'hpa.enabled':True,'hpa.target':65})
  k('scale','deployment/planner','--replicas=2');wait_ready()
@@ -38,4 +41,5 @@ def main():
   wait_minimum('hot')
  finally:stop.set();th.join()
  h=obj('get','hpa','planner');(OUT/'hpa-final.json').write_text(json.dumps(h,indent=2))
+ with (OUT/'timeline.jsonl').open('a') as f:f.write(json.dumps({'wall':time.time(),'hpa':{'items':[h]},'pods':obj('get','pods'),'alerts':get('http://127.0.0.1:19090/api/v1/rules'),'final':True})+'\n')
 if __name__=='__main__':main()

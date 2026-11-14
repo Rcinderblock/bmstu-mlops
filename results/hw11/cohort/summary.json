@@ -1,0 +1,22 @@
+{
+  "start_wall": 1794647872.483534,
+  "end_wall": 1794647884.4463859,
+  "pods": [
+    "planner-786b9c5754-pqkkb",
+    "planner-786b9c5754-zlbjx"
+  ],
+  "client_count": 80,
+  "prometheus_count": 80,
+  "client_p95_seconds": 0.11093630410905461,
+  "histogram_p95_seconds": 0.14999999999999997,
+  "queries": {
+    "count": "sum(planner_ttfc_seconds_count{pod=~\"planner-786b9c5754-pqkkb|planner-786b9c5754-zlbjx\"})",
+    "per_pod": "planner_ttfc_seconds_count{pod=~\"planner-786b9c5754-pqkkb|planner-786b9c5754-zlbjx\"}",
+    "buckets": "sum by(le) (planner_ttfc_seconds_bucket{pod=~\"planner-786b9c5754-pqkkb|planner-786b9c5754-zlbjx\"})",
+    "p95": "histogram_quantile(0.95, sum by(le) (planner_ttfc_seconds_bucket{pod=~\"planner-786b9c5754-pqkkb|planner-786b9c5754-zlbjx\"}))"
+  },
+  "explanation": "Fresh Pod counters; only this cohort generated first chunks. Client adds network overhead; classic bucket quantile interpolates.",
+  "scope_correction": "Initial Pod list included two terminating prior Pods. Historical Prometheus samples at original cohort boundaries were queried for the two Pods that actually served the 80 requests. Zero before, per-Pod counts match 43/37, total80 after. Original selection preserved.",
+  "prometheus_query_before_time": 1794647872.538,
+  "prometheus_query_after_time": 1794647891.462
+}

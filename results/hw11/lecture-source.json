@@ -1,0 +1,8 @@
+{
+  "lecture": "lecture11-extended.mp4",
+  "company_case_at_seconds": 584.72,
+  "case": "Anthropic: context-window routing error and sticky follow-ups",
+  "primary_source": "https://www.anthropic.com/research/a-postmortem-of-three-recent-issues",
+  "source_date": "2025-09-17",
+  "homework_sha256": "bcc2120fa05947fbcb78dd9942948970ad47c5c2b83d46a9a4c9a01ffd4d774f"
+}

@@ -1,0 +1,20 @@
+{
+  "name": "sticky-hot-1",
+  "ended_wall": 1794645305.2499032,
+  "exit_codes": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "expected": 1680,
+  "sent": 1680,
+  "outcomes": {
+    "completed": 1278,
+    "rejected": 402
+  },
+  "by_pod": {
+    "planner-857bb4c8b9-59dnr": 1456,
+    "planner-857bb4c8b9-sx4cb": 224
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "c-ordinary-uniform-1",
+  "ended_wall": 1794648111.440022,
+  "exit_codes": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "expected": 3600,
+  "sent": 3600,
+  "outcomes": {
+    "completed": 1807,
+    "rejected": 1793
+  },
+  "by_pod": {
+    "planner-6dd46c698b-69jth": 836,
+    "planner-6dd46c698b-9jfrq": 1350,
+    "planner-6dd46c698b-g74df": 1414
+  }
+}

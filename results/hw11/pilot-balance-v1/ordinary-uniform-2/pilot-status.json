@@ -1,0 +1,3 @@
+{
+  "note": "Pilot stopped between comparisons to add identity to rejection responses; in-flight clients allowed to finish and raw rows recovered. Not part of final comparison."
+}

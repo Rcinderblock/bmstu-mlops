@@ -1,0 +1,4 @@
+API http://127.0.0.1:8091
+{"event": "loaded", "wall_time": 1794647742.4742546, "pod": "planner-5dd7b56db-w25p6", "backend_mode": "simulated", "model_id": "planner-cpu-B", "artifact_sha256": "4dc8e8ba8c52ebb016bfc2119adb7293f4d0bd622b85e13bf79984377beadb1a"}
+{"event": "load_failed", "wall_time": 1794647745.4756327, "pod": "planner-5dd7b56db-w25p6", "backend_mode": "simulated", "model_id": "planner-cpu-B", "error": "deliberately unready release"}
+{"event": "draining", "wall_time": 1794647768.7809503, "pod": "planner-5dd7b56db-w25p6", "backend_mode": "simulated", "model_id": "planner-cpu-B"}

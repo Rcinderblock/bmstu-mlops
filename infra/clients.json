@@ -16,7 +16,7 @@
         "containers": [
           {
             "name": "client",
-            "image": "planner-hw11:v2",
+            "image": "planner-hw11:v3",
             "imagePullPolicy": "IfNotPresent",
             "command": [
               "sleep",
@@ -64,7 +64,7 @@
         "containers": [
           {
             "name": "client",
-            "image": "planner-hw11:v2",
+            "image": "planner-hw11:v3",
             "imagePullPolicy": "IfNotPresent",
             "command": [
               "sleep",
@@ -112,7 +112,7 @@
         "containers": [
           {
             "name": "client",
-            "image": "planner-hw11:v2",
+            "image": "planner-hw11:v3",
             "imagePullPolicy": "IfNotPresent",
             "command": [
               "sleep",
@@ -160,7 +160,7 @@
         "containers": [
           {
             "name": "client",
-            "image": "planner-hw11:v2",
+            "image": "planner-hw11:v3",
             "imagePullPolicy": "IfNotPresent",
             "command": [
               "sleep",

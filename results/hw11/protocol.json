@@ -1,0 +1,18 @@
+{
+  "duration_seconds": 120,
+  "global_requests_per_second": 14,
+  "clients": 4,
+  "parts": 4,
+  "chunk_ms": 25,
+  "cache_entries": 8,
+  "cache_hit_cpu_ms": 5,
+  "cache_miss_cpu_ms": 80,
+  "max_running": 1,
+  "max_waiting": 32,
+  "queue_timeout_seconds": 8,
+  "clock_quality": {
+    "max_wall_minus_monotonic_span_seconds": 0.5,
+    "minimum_span_between_global_first_and_last_send_seconds": 119.5
+  },
+  "note": "Validity is checked from actual timestamps; large clock-discontinuous phases are preserved separately and repeated. TTFC starts at actual send; send lag is reported separately."
+}

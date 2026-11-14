@@ -1,0 +1,20 @@
+{
+  "start_wall": 1794647872.483534,
+  "end_wall": 1794647884.4463859,
+  "pods": [
+    "planner-786b9c5754-pqkkb",
+    "planner-786b9c5754-zlbjx",
+    "planner-c8994ddc8-2t4cb",
+    "planner-c8994ddc8-d6g2b"
+  ],
+  "client_count": 80,
+  "prometheus_count": 80,
+  "client_p95_seconds": 0.11093630410905461,
+  "histogram_p95_seconds": 0.14999999999999997,
+  "queries": {
+    "count": "sum(planner_ttfc_seconds_count{pod=~\"planner-786b9c5754-pqkkb|planner-786b9c5754-zlbjx|planner-c8994ddc8-2t4cb|planner-c8994ddc8-d6g2b\"})",
+    "buckets": "sum by(le) (planner_ttfc_seconds_bucket{pod=~\"planner-786b9c5754-pqkkb|planner-786b9c5754-zlbjx|planner-c8994ddc8-2t4cb|planner-c8994ddc8-d6g2b\"})",
+    "p95": "histogram_quantile(0.95, sum by(le) (planner_ttfc_seconds_bucket{pod=~\"planner-786b9c5754-pqkkb|planner-786b9c5754-zlbjx|planner-c8994ddc8-2t4cb|planner-c8994ddc8-d6g2b\"}))"
+  },
+  "explanation": "Fresh Pod counters; only this cohort generated first chunks. Client adds network overhead; classic bucket quantile interpolates."
+}

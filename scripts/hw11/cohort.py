@@ -1,17 +1,19 @@
 """Один изолированный набор: точное совпадение client и classic bucket count."""
 from pathlib import Path
-import json,sys,time,urllib.request,urllib.parse
+import json,sys,time,urllib.request,urllib.parse,os
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from common import k,pods,helm,wait_ready,ROOT
-OUT=ROOT/'results/hw11/cohort';OUT.mkdir(parents=True,exist_ok=True)
+OUT=Path(os.environ.get('HW11_OUT',str(ROOT/'notes/work/hw11/repeats'/time.strftime('%Y%m%d-%H%M%S')/'cohort'))).resolve();OUT.mkdir(parents=True,exist_ok=True)
+if any(OUT.iterdir()):raise FileExistsError('HW11_OUT должен быть новым каталогом')
 helm(modelVersion='A',warmupSeconds=3,cacheHitCpuMs=5,cacheMissCpuMs=80)
 k('rollout','restart','deployment/planner');wait_ready()
-current=pods();names=[p['metadata']['name'] for p in current];matcher='|'.join(names)
+current=[p for p in pods() if not p['metadata'].get('deletionTimestamp') and any(c['type']=='Ready' and c['status']=='True' for c in p['status'].get('conditions',[]))];assert len(current)==2;names=[p['metadata']['name'] for p in current];matcher='|'.join(names)
 def query(q):
  with urllib.request.urlopen('http://127.0.0.1:19090/api/v1/query?'+urllib.parse.urlencode({'query':q}),timeout=10) as r:return json.load(r)
 base='planner_ttfc_seconds'
 selector='{pod=~"'+matcher+'"}'
 time.sleep(7);start=time.time();before=query('sum('+base+'_count'+selector+')');(OUT/'before.json').write_text(json.dumps(before,indent=2))
+assert float(before['data']['result'][0]['value'][1])==0,'Cohort must start at zero'
 code="""import asyncio,json,sys,time,httpx
 sys.path.insert(0,'/app/scripts/hw11');from client import attempt
 async def run():

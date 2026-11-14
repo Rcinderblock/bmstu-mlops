@@ -1,0 +1,28 @@
+test_01_warmup_defect_and_fixed_endpoints (__main__.KubernetesIntegration.test_01_warmup_defect_and_fixed_endpoints) ... ok
+test_02_rollout_and_rollback_actual_loaded_version (__main__.KubernetesIntegration.test_02_rollout_and_rollback_actual_loaded_version) ... ok
+test_03_replacement_restores_artifact_and_dialog (__main__.KubernetesIntegration.test_03_replacement_restores_artifact_and_dialog) ... ok
+test_04_rejections_and_forced_interruption_accounted (__main__.KubernetesIntegration.test_04_rejections_and_forced_interruption_accounted) ... FAIL
+test_05_two_dialogs_are_isolated (__main__.KubernetesIntegration.test_05_two_dialogs_are_isolated) ... ok
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 64627 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 64444 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+
+======================================================================
+FAIL: test_04_rejections_and_forced_interruption_accounted (__main__.KubernetesIntegration.test_04_rejections_and_forced_interruption_accounted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ralolaev/bmstu/MLOps/tests/hw11/test_cluster.py", line 99, in test_04_rejections_and_forced_interruption_accounted
+    broken=finish(long,'forced-result');self.assertEqual(broken['outcome'],'interrupted');self.assertLess(broken['chunks'],100)
+                                        ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'completed' != 'interrupted'
+- completed
++ interrupted
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 329.165s
+
+FAILED (failures=1)

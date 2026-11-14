@@ -1,0 +1,23 @@
+{
+  "kind_node_usage_kib": {
+    "/var/lib/containerd": 2495056,
+    "/var/lib/kubelet/pods": 90408,
+    "/var/log/pods": 892
+  },
+  "volume_caps": {
+    "prometheus": "256Mi",
+    "grafana": "64Mi",
+    "client_tmp_each": "64Mi",
+    "clients": 4
+  },
+  "prometheus_retention": {
+    "time": "2h",
+    "size": "128MB"
+  },
+  "filesystem_after": {
+    "total": 494384795648,
+    "used": 353457664000,
+    "free": 140927131648
+  },
+  "note": "Node usage includes system container images and Kubernetes components; it is an estimate of this dedicated cluster, not a sum of every Docker Desktop image."
+}

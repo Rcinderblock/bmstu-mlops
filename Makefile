@@ -36,10 +36,18 @@ down:
 
 .PHONY: k8s-build k8s-test k8s-balance k8s-autoscale
 k8s-build:
-	docker build -f Dockerfile.k8s -t planner-hw11:v2 .
+	docker build -f Dockerfile.k8s -t planner-hw11:v3 .
 k8s-test:
 	python3 tests/hw11/test_cluster.py
 k8s-balance:
 	python3 scripts/hw11/run_balance.py
 k8s-autoscale:
 	python3 scripts/hw11/run_autoscale.py
+
+.PHONY: k8s-status k8s-smoke k8s-evidence
+k8s-status:
+	kubectl --kubeconfig notes/work/hw11/kubeconfig -n mlops-hw11 get pods,hpa
+k8s-smoke:
+	python3 scripts/hw11/smoke.py
+k8s-evidence:
+	python3 scripts/hw11/show_checks.py

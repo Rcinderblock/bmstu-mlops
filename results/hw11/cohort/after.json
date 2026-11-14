@@ -1,0 +1,216 @@
+{
+  "count": {
+    "status": "success",
+    "data": {
+      "resultType": "vector",
+      "result": [
+        {
+          "metric": {},
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        }
+      ]
+    }
+  },
+  "per_pod": {
+    "status": "success",
+    "data": {
+      "resultType": "vector",
+      "result": [
+        {
+          "metric": {
+            "__name__": "planner_ttfc_seconds_count",
+            "instance": "10.244.0.58:8091",
+            "job": "planner-pods",
+            "pod": "planner-786b9c5754-pqkkb"
+          },
+          "value": [
+            1794647891.462,
+            "43"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "planner_ttfc_seconds_count",
+            "instance": "10.244.0.59:8091",
+            "job": "planner-pods",
+            "pod": "planner-786b9c5754-zlbjx"
+          },
+          "value": [
+            1794647891.462,
+            "37"
+          ]
+        }
+      ]
+    }
+  },
+  "buckets": {
+    "status": "success",
+    "data": {
+      "resultType": "vector",
+      "result": [
+        {
+          "metric": {
+            "le": "0.01"
+          },
+          "value": [
+            1794647891.462,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025"
+          },
+          "value": [
+            1794647891.462,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05"
+          },
+          "value": [
+            1794647891.462,
+            "70"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1"
+          },
+          "value": [
+            1794647891.462,
+            "72"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.2"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.4"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.8"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.2"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.0"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "3.0"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "8.0"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "15.0"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf"
+          },
+          "value": [
+            1794647891.462,
+            "80"
+          ]
+        }
+      ]
+    }
+  },
+  "p95": {
+    "status": "success",
+    "data": {
+      "resultType": "vector",
+      "result": [
+        {
+          "metric": {},
+          "value": [
+            1794647891.462,
+            "0.14999999999999997"
+          ]
+        }
+      ]
+    }
+  }
+}

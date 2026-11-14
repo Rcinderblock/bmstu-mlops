@@ -1,0 +1,20 @@
+{
+  "name": "sticky-uniform-1",
+  "ended_wall": 1794644050.275779,
+  "exit_codes": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "expected": 1680,
+  "sent": 1680,
+  "outcomes": {
+    "completed": 1489,
+    "rejected": 191
+  },
+  "by_pod": {
+    "planner-56874c958d-kxzdp": 1069,
+    "planner-56874c958d-rrj7h": 420
+  }
+}

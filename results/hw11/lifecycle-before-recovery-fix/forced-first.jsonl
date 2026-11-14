@@ -1,0 +1,1 @@
+{"event": "first", "row": {"request_id": "b7fa1118-ec8a-47af-9594-f3dfb98a40db", "sent_wall": 1794647382.637905, "sent_mono": 370646.391040825, "outcome": "interrupted", "chunks": 0, "status": 200, "pod": "planner-c8994ddc8-8wclh", "model_id": "planner-cpu-A", "first_mono": 370646.873534366}}

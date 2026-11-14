@@ -1,0 +1,23 @@
+I1114 08:07:38.970762       1 shared_informer.go:349] "Waiting for caches to sync" controller="node informer cache"
+I1114 08:07:39.071496       1 shared_informer.go:356] "Caches are synced" controller="node informer cache"
+I1114 08:07:39.071563       1 server.go:219] "Successfully retrieved NodeIPs" NodeIPs=["172.23.0.2"]
+I1114 08:07:39.071671       1 conntrack.go:121] "Set sysctl" entry="net/netfilter/nf_conntrack_tcp_timeout_established" value=86400
+I1114 08:07:39.071689       1 conntrack.go:121] "Set sysctl" entry="net/netfilter/nf_conntrack_tcp_timeout_close_wait" value=3600
+E1114 08:07:39.071699       1 server.go:256] "Kube-proxy configuration may be incomplete or incorrect" err="nodePortAddresses is unset; NodePort connections will be accepted on all local IPs. Consider using `--nodeport-addresses primary`"
+I1114 08:07:39.085853       1 server.go:265] "kube-proxy running in dual-stack mode" primary ipFamily="IPv4"
+I1114 08:07:39.085887       1 server_linux.go:132] "Using iptables Proxier"
+I1114 08:07:39.088679       1 proxier.go:242] "Setting route_localnet=1 to allow node-ports on localhost; to change this either disable iptables.localhostNodePorts (--iptables-localhost-nodeports) or set nodePortAddresses (--nodeport-addresses) to filter loopback addresses" ipFamily="IPv4"
+I1114 08:07:39.088809       1 server.go:527] "Version info" version="v1.34.0"
+I1114 08:07:39.088817       1 server.go:529] "Golang settings" GOGC="" GOMAXPROCS="" GOTRACEBACK=""
+I1114 08:07:39.089322       1 config.go:200] "Starting service config controller"
+I1114 08:07:39.089338       1 shared_informer.go:349] "Waiting for caches to sync" controller="service config"
+I1114 08:07:39.089578       1 config.go:106] "Starting endpoint slice config controller"
+I1114 08:07:39.089587       1 shared_informer.go:349] "Waiting for caches to sync" controller="endpoint slice config"
+I1114 08:07:39.089594       1 config.go:403] "Starting serviceCIDR config controller"
+I1114 08:07:39.089596       1 shared_informer.go:349] "Waiting for caches to sync" controller="serviceCIDR config"
+I1114 08:07:39.089883       1 config.go:309] "Starting node config controller"
+I1114 08:07:39.089896       1 shared_informer.go:349] "Waiting for caches to sync" controller="node config"
+I1114 08:07:39.089903       1 shared_informer.go:356] "Caches are synced" controller="node config"
+I1114 08:07:39.190659       1 shared_informer.go:356] "Caches are synced" controller="service config"
+I1114 08:07:39.190908       1 shared_informer.go:356] "Caches are synced" controller="serviceCIDR config"
+I1114 08:07:39.190920       1 shared_informer.go:356] "Caches are synced" controller="endpoint slice config"

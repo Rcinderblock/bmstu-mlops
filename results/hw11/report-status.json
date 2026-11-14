@@ -1,0 +1,7 @@
+{
+  "completed_balance_runs": 15,
+  "expected_balance_runs": 15,
+  "autoscale_runs": 2,
+  "cluster_tests_passed": true,
+  "requests_in_csv": 40560
+}

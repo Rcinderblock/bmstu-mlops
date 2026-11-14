@@ -1,0 +1,6 @@
+API http://127.0.0.1:8091
+{"event": "loaded", "wall_time": 1794646722.6614804, "pod": "planner-c8994ddc8-h87mg", "backend_mode": "simulated", "model_id": "planner-cpu-A", "artifact_sha256": "2f632e8c225e71a7433667c18082d4130949a0d937efc83d96218092d6818d03"}
+{"event": "warmup_finished", "wall_time": 1794646742.7205856, "pod": "planner-c8994ddc8-h87mg", "backend_mode": "simulated", "model_id": "planner-cpu-A"}
+{"event": "queued", "wall_time": 1794646745.573845, "pod": "planner-c8994ddc8-h87mg", "backend_mode": "simulated", "model_id": "planner-cpu-A", "request_id": "83020c95-a1a1-4200-938f-d0916aa98a38", "session_id": "review", "client_ip": "10.244.0.15"}
+{"event": "completed", "wall_time": 1794646745.7585266, "pod": "planner-c8994ddc8-h87mg", "backend_mode": "simulated", "model_id": "planner-cpu-A", "request_id": "83020c95-a1a1-4200-938f-d0916aa98a38", "session_id": "review", "client_ip": "10.244.0.15", "queue_seconds": 0.00013695895904675126, "elapsed": 0.18471662496449426, "parts": 4, "cache_hit": false}
+{"event": "draining", "wall_time": 1794646807.6384957, "pod": "planner-c8994ddc8-h87mg", "backend_mode": "simulated", "model_id": "planner-cpu-A"}

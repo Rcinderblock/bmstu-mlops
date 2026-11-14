@@ -1,15 +1,28 @@
 """Все пять проверок действительно меняют/запрашивают отдельный учебный кластер."""
 from pathlib import Path
-import json,subprocess,sys,time,unittest,threading,uuid
+import json,subprocess,sys,time,unittest,threading,uuid,os
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT/'scripts/hw11'))
 from common import k,obj,pods,helm,wait_ready,KUBE,NS
-OUT=ROOT/'results/hw11/lifecycle';OUT.mkdir(parents=True,exist_ok=True)
+OUT=Path(os.environ.get('HW11_OUT',str(ROOT/'notes/work/hw11/repeats'/time.strftime('%Y%m%d-%H%M%S')/'lifecycle'))).resolve();OUT.mkdir(parents=True,exist_ok=True)
+if any(OUT.iterdir()):raise FileExistsError('HW11_OUT должен быть новым каталогом')
 PROBE=(ROOT/'scripts/hw11/probe.py').read_text()
 stop=threading.Event()
 def snapshot():
+ seen=set();followers=[]
  with (OUT/'timeline.jsonl').open('a',buffering=1) as f:
   while not stop.is_set():
-   row={'wall':time.time(),'pods':obj('get','pods'),'endpoints':obj('get','endpointslices')};f.write(json.dumps(row)+'\n');stop.wait(1)
+   row={'wall':time.time(),'pods':obj('get','pods'),'endpoints':obj('get','endpointslices')};f.write(json.dumps(row)+'\n')
+   for pod in row['pods']['items']:
+    if pod['metadata'].get('labels',{}).get('app')!='planner' or pod['status'].get('phase')!='Running':continue
+    name=pod['metadata']['name'];restart=sum(c.get('restartCount',0) for c in pod['status'].get('containerStatuses',[]));key=(name,restart)
+    if key in seen:continue
+    log=(OUT/(name+'-r'+str(restart)+'.log')).open('w');proc=subprocess.Popen(['kubectl','--kubeconfig',str(KUBE),'-n',NS,'logs','-f',name],stdout=log,stderr=subprocess.STDOUT);followers.append((proc,log));seen.add(key)
+   stop.wait(1)
+ for proc,log in followers:
+  proc.terminate()
+  try:proc.wait(timeout=5)
+  except subprocess.TimeoutExpired:proc.kill();proc.wait()
+  log.close()
 def record(name,value):
  with (OUT/(name+'.jsonl')).open('a') as f:f.write(json.dumps(value,ensure_ascii=False)+'\n')
 def payload(text='контроль',parts=4,chunk_ms=25,messages=None):return dict(request_id=str(uuid.uuid4()),session_id='review',messages=messages or [{'role':'user','content':text}],parts=parts,chunk_ms=chunk_ms)
@@ -49,9 +62,11 @@ class KubernetesIntegration(unittest.TestCase):
    safe.append(request('fixed-warmup'));time.sleep(.3)
   wait_ready();self.assertTrue(observed);self.assertTrue(all(r['status']==200 for r in safe))
  def test_02_rollout_and_rollback_actual_loaded_version(self):
-  long=start(payload(parts=100,chunk_ms=400));first=json.loads(long.stdout.readline());record('rollout-long-first',first)
+  # A long stream and a short control request fit without artificial queue refusal.
+  helm(modelVersion='A',maxRunning=2);wait_ready()
+  long=start(payload(parts=100,chunk_ms=500));first=json.loads(long.stdout.readline());record('rollout-long-first',first)
   self.assertEqual(first['row']['model_id'],'planner-cpu-A')
-  helm(modelVersion='B',warmupSeconds=20)
+  helm(modelVersion='B',warmupSeconds=20,maxRunning=2)
   live=[]
   deadline=time.time()+100
   while time.time()<deadline:
@@ -84,12 +99,28 @@ async def run():
 asyncio.run(run())"""
   rows=json.loads(k('exec','client-0','--','python','-c',code));record('burst-all-attempts',rows);self.assertEqual(len(rows),90);self.assertTrue(any(r['status']==429 for r in rows))
   long=start(payload(parts=100,chunk_ms=200));first=json.loads(long.stdout.readline());record('forced-first',first);victim=first['row']['pod']
-  try:k('exec',victim,'--','python','-c','import os;os.kill(1,9)')
-  except subprocess.CalledProcessError:pass
+  cid=next(p['status']['containerStatuses'][0]['containerID'].split('://',1)[1] for p in pods() if p['metadata']['name']==victim)
+  record('forced-runtime-kill',{'pod':victim,'container_id':cid,'signal':'SIGKILL','wall':time.time()})
+  subprocess.run(['docker','exec','mlops-hw11-control-plane','ctr','--namespace','k8s.io','tasks','kill','--signal','SIGKILL',cid],check=True)
   broken=finish(long,'forced-result');self.assertEqual(broken['outcome'],'interrupted');self.assertLess(broken['chunks'],100)
+  # rollout status alone may still contain the pre-crash status. Verify the
+  # new container identity and actual backend warmup before asserting recovery.
+  restored=False;deadline=time.time()+90
+  while time.time()<deadline:
+   victim_pod=next((p for p in pods() if p['metadata']['name']==victim),None)
+   if victim_pod:
+    new_cid=victim_pod['status'].get('containerStatuses',[{}])[0].get('containerID','')
+    try:backend_state=direct('/debug',victim_pod['status']['podIP'])
+    except subprocess.CalledProcessError:backend_state={'ready':False}
+    record('forced-recovery-state',{'wall':time.time(),'container_id':new_cid,'state':backend_state})
+    if new_cid and new_cid!='containerd://'+cid and backend_state.get('ready'):
+     restored=True;break
+   time.sleep(1)
+  self.assertTrue(restored,'New container did not reload and warm up')
   wait_ready();self.assertEqual(request('forced-recovered')['outcome'],'completed')
  def test_05_two_dialogs_are_isolated(self):
   a=payload(messages=[{'role':'user','content':'секрет диалога альфа'},{'role':'user','content':'только альфа'}]);b=payload(messages=[{'role':'user','content':'секрет диалога бета'},{'role':'user','content':'только бета'}])
+  a['session_id']='dialog-alpha';b['session_id']='dialog-beta'
   for _ in range(5):
    a['request_id']=str(uuid.uuid4());b['request_id']=str(uuid.uuid4())
    ra=request('dialog-alpha',a);rb=request('dialog-beta',b)

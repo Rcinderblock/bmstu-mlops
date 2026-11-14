@@ -1,0 +1,12 @@
+{
+  "ServerVersion": "29.2.0",
+  "NCPU": 8,
+  "MemTotal": 8217665536,
+  "Driver": "overlayfs",
+  "Architecture": "aarch64",
+  "free_disk_before": {
+    "total": 494384795648,
+    "used": 344999763968,
+    "free": 149385031680
+  }
+}

@@ -3,9 +3,9 @@ import argparse,asyncio,json,os,time,socket
 from pathlib import Path
 import httpx
 
-async def attempt(client,url,payload,planned,case_id,scenario,client_index):
-    sent=time.perf_counter();wall=time.time();parts=[];first=None;last=None;intervals=[];done=None
-    row=dict(case_id=case_id,scenario=scenario,client_index=client_index,client_ip=socket.gethostbyname(socket.gethostname()),request_id=payload['request_id'],planned_wall=planned,planned_offset=sent-wall+planned,sent_wall=wall,sent_mono=sent,send_lag_seconds=wall-planned,input_chars=sum(len(x['content']) for x in payload['messages']),limit_parts=payload['parts'],backend_mode='simulated',status=None,pod=None,model_id=None)
+async def attempt(client,url,payload,planned,case_id,scenario,client_index,planned_mono=None):
+    sent=time.perf_counter();wall=time.time();planned_mono=planned_mono if planned_mono is not None else sent-wall+planned;parts=[];first=None;last=None;intervals=[];done=None
+    row=dict(case_id=case_id,scenario=scenario,client_index=client_index,client_ip=socket.gethostbyname(socket.gethostname()),request_id=payload['request_id'],planned_wall=planned,planned_offset=planned_mono,planned_mono=planned_mono,sent_wall=wall,sent_mono=sent,send_lag_seconds=sent-planned_mono,wall_send_lag_seconds=wall-planned,clock_offset_seconds=wall-sent,input_chars=sum(len(x['content']) for x in payload['messages']),limit_parts=payload['parts'],backend_mode='simulated',status=None,pod=None,model_id=None)
     try:
         async with client.stream('POST',url,json=payload,headers={'Connection':'close'}) as r:
             row.update(status=r.status_code,pod=r.headers.get('x-pod-name'),model_id=r.headers.get('x-model-id'))
@@ -27,17 +27,20 @@ async def attempt(client,url,payload,planned,case_id,scenario,client_index):
     return row
 
 async def main(args):
+    Path(args.out).touch(exist_ok=False)
     start=args.start or time.time()+2
+    origin_mono=time.perf_counter()+start-time.time()
     rows=[];tasks=[]
     async with httpx.AsyncClient(timeout=httpx.Timeout(15,connect=3),limits=httpx.Limits(max_connections=100,max_keepalive_connections=0)) as client:
         for i in range(round(args.duration*args.rate)):
             ci=i%4 if args.traffic=='uniform' else (0 if i%10<8 else 1+(i//10+i%2)%3)
             if ci!=args.client:continue
             planned=start+i/args.rate
-            await asyncio.sleep(max(0,planned-time.time()))
+            planned_mono=origin_mono+i/args.rate
+            await asyncio.sleep(max(0,planned_mono-time.perf_counter()))
             text='контроль '+str(ci)
             payload=dict(request_id=f'{args.scenario}-{i}',session_id=f'dialog-{ci}',messages=[{'role':'system','content':'prefix-'+str(ci)},{'role':'user','content':text}],parts=args.parts,chunk_ms=args.chunk_ms)
-            tasks.append(asyncio.create_task(attempt(client,args.url,payload,planned,i,args.scenario,ci)))
+            tasks.append(asyncio.create_task(attempt(client,args.url,payload,planned,i,args.scenario,ci,planned_mono)))
         for task in asyncio.as_completed(tasks):
             row=await task;rows.append(row)
             with open(args.out,'a') as f:f.write(json.dumps(row,ensure_ascii=False)+'\n')

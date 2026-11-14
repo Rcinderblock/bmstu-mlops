@@ -1,11 +1,14 @@
 {{- $model := printf "{\"backend_mode\":\"simulated\",\"model_id\":\"planner-cpu-%s\"}" .Values.modelVersion -}}
+{{- range $version := list "A" "B" .Values.modelVersion | uniq }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: planner-model-{{ .Values.modelVersion | lower }}
+  name: planner-model-{{ $version | lower }}
+immutable: true
 data:
-  model.json: {{ $model | quote }}
+  model.json: {{ printf "{\"backend_mode\":\"simulated\",\"model_id\":\"planner-cpu-%s\"}" $version | quote }}
 ---
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

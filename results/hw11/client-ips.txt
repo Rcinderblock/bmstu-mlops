@@ -1,0 +1,9 @@
+NAME                         READY   STATUS    RESTARTS   AGE     IP            NODE                       NOMINATED NODE   READINESS GATES
+client-0                     1/1     Running   0          110s    10.244.0.15   mlops-hw11-control-plane   <none>           <none>
+client-1                     1/1     Running   0          110s    10.244.0.16   mlops-hw11-control-plane   <none>           <none>
+client-2                     1/1     Running   0          110s    10.244.0.17   mlops-hw11-control-plane   <none>           <none>
+client-3                     1/1     Running   0          110s    10.244.0.18   mlops-hw11-control-plane   <none>           <none>
+grafana-cc75679fb-nh287      1/1     Running   0          9m58s   10.244.0.8    mlops-hw11-control-plane   <none>           <none>
+planner-857bb4c8b9-59dnr     1/1     Running   0          110s    10.244.0.19   mlops-hw11-control-plane   <none>           <none>
+planner-857bb4c8b9-sx4cb     1/1     Running   0          88s     10.244.0.20   mlops-hw11-control-plane   <none>           <none>
+prometheus-b8c954654-2lc5r   1/1     Running   0          9m58s   10.244.0.7    mlops-hw11-control-plane   <none>           <none>

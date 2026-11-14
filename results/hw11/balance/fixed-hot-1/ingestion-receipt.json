@@ -1,0 +1,34 @@
+[
+  {
+    "client": 0,
+    "combined_capture_sha256": "3ba5eda85ec9458e66c51ed2e83306a3598fa7c407531b7104ca4a122a725641",
+    "stale_prefix_sha256": "a333a261758cb10780ab23efc80a5ed1237e84eb5bef0637cf3031708984cdc4",
+    "current_phase_sha256": "14d840004df3a7a3d8687ed89d2f2aea2b7e17c8fa06a8b2ff49a17c91ef80ab",
+    "stale_rows_preserved_at": "results/hw11/invalid-fixed-wall-clock/fixed-hot-1/client-0.jsonl",
+    "new_rows": 1344
+  },
+  {
+    "client": 1,
+    "combined_capture_sha256": "dfc97f7193f182d9b0d763c5834d5396e545a2f3ee30fb8abc16269ac661aa8a",
+    "stale_prefix_sha256": "b7f0cd1bd8459200aa121d3f89979f61202d9f4761823e676f01440a076ded0e",
+    "current_phase_sha256": "f195560b1f18380c9ebb36a1e41073d71ea1339cbfc93d00ca222960d58433ce",
+    "stale_rows_preserved_at": "results/hw11/invalid-fixed-wall-clock/fixed-hot-1/client-1.jsonl",
+    "new_rows": 112
+  },
+  {
+    "client": 2,
+    "combined_capture_sha256": "5aafde39d8f35cdb238eba6463f7d5a594f67226fe96ebf20f43ca3d8259d590",
+    "stale_prefix_sha256": "7952b6e5639d3eff4c41bf812478e6e80a80d92cf778b3bb005c2854b1671f70",
+    "current_phase_sha256": "0d2ce6c463194b3d89d224662de73cc350a23488ba8cb9094615fc7c30dc3583",
+    "stale_rows_preserved_at": "results/hw11/invalid-fixed-wall-clock/fixed-hot-1/client-2.jsonl",
+    "new_rows": 112
+  },
+  {
+    "client": 3,
+    "combined_capture_sha256": "e46005dd04d6c36a21a5bb7cea393a2b440eb577e65184b8c3656c8d26430f0a",
+    "stale_prefix_sha256": "f74c757e2caf85fa543d25404f3fd99dbf95f606e239d5745a719fc8e67f10c6",
+    "current_phase_sha256": "cafe698a25969e3022a855d588724d4060a720e6fe017ca5697f25417306a836",
+    "stale_rows_preserved_at": "results/hw11/invalid-fixed-wall-clock/fixed-hot-1/client-3.jsonl",
+    "new_rows": 112
+  }
+]

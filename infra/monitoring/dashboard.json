@@ -79,8 +79,14 @@
       },
       "targets": [
         {
-          "expr": "planner_running or planner_waiting",
-          "legendFormat": "{{pod}} {{outcome}}"
+          "refId": "A",
+          "expr": "planner_running",
+          "legendFormat": "running {{pod}}"
+        },
+        {
+          "refId": "B",
+          "expr": "planner_waiting",
+          "legendFormat": "waiting {{pod}}"
         }
       ],
       "fieldConfig": {

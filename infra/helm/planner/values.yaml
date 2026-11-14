@@ -1,4 +1,4 @@
-image: planner-hw11:v2
+image: planner-hw11:v3
 replicas: 2
 modelVersion: A
 warmupSeconds: 20

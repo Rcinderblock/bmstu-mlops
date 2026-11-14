@@ -1,0 +1,1 @@
+{"reason":"Large wall-minus-monotonic offset steps compressed the intended 120s workload into bursts. Preserved as a generator failure, excluded from matched comparisons."}

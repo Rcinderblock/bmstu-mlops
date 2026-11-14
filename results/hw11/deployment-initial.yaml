@@ -1,0 +1,145 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    meta.helm.sh/release-name: planner
+    meta.helm.sh/release-namespace: mlops-hw11
+  creationTimestamp: "2026-11-14T08:09:02Z"
+  generation: 2
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: planner
+  namespace: mlops-hw11
+  resourceVersion: "1743"
+  uid: cae59b53-5db6-4abb-8ed4-1ac9b03df374
+spec:
+  progressDeadlineSeconds: 100
+  replicas: 2
+  revisionHistoryLimit: 4
+  selector:
+    matchLabels:
+      app: planner
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+      labels:
+        app: planner
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: MODEL_FILE
+          value: /model/model.json
+        - name: MODEL_SHA256
+          value: 2f632e8c225e71a7433667c18082d4130949a0d937efc83d96218092d6818d03
+        - name: WARMUP_SECONDS
+          value: "20"
+        - name: BROKEN_PROBES
+          value: "false"
+        - name: NEVER_READY
+          value: "false"
+        - name: CACHE_HIT_CPU_MS
+          value: "5"
+        - name: CACHE_MISS_CPU_MS
+          value: "80"
+        - name: CACHE_ENTRIES
+          value: "8"
+        - name: MAX_RUNNING
+          value: "1"
+        - name: MAX_WAITING
+          value: "32"
+        image: planner-hw11:v2
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - python
+              - -c
+              - import urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8091/admin/drain',
+                data=b'',method='POST'),timeout=5).read()
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: api
+        ports:
+        - containerPort: 8091
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 1
+          httpGet:
+            path: /ready
+            port: http
+            scheme: HTTP
+          periodSeconds: 1
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: "1"
+            memory: 192Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+        startupProbe:
+          failureThreshold: 90
+          httpGet:
+            path: /startup
+            port: http
+            scheme: HTTP
+          periodSeconds: 1
+          successThreshold: 1
+          timeoutSeconds: 1
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /model
+          name: model
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 40
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: planner-model-a
+        name: model
+status:
+  availableReplicas: 2
+  conditions:
+  - lastTransitionTime: "2026-11-14T08:09:24Z"
+    lastUpdateTime: "2026-11-14T08:09:24Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2026-11-14T08:09:02Z"
+    lastUpdateTime: "2026-11-14T08:17:53Z"
+    message: ReplicaSet "planner-857bb4c8b9" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 2
+  readyReplicas: 2
+  replicas: 2
+  updatedReplicas: 2

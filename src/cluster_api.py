@@ -97,7 +97,9 @@ def create_simulated_app():
     async def generate(payload:StreamRequest,request:Request):
         received=time.perf_counter();rid=payload.request_id;request.state.request_id=rid
         identity=dict(request_id=rid,session_id=payload.session_id,client_ip=request.client.host)
-        if not state['ready'] or state['draining']:
+        # Readiness removes the endpoint first; accept already routed arrivals
+        # during the propagation pause. SIGTERM then closes the listener gracefully.
+        if not state['ready']:
             total.labels('unready').inc();log('rejected_unready',**identity)
             raise HTTPException(503,'backend is not warmed or draining')
         if state['waiting']>=int(os.getenv('MAX_WAITING','32')):
