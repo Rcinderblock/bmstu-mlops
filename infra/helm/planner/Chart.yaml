@@ -1,0 +1,4 @@
+apiVersion: v2
+name: planner
+version: 0.1.0
+appVersion: 'hw11-v1'

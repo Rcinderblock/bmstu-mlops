@@ -1,0 +1,3 @@
+# Reproduce only in the isolated lab. HTTP process startup is incorrectly treated as ready.
+brokenProbes: true
+warmupSeconds: 20

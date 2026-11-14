@@ -1,0 +1,111 @@
+{{- $model := printf "{\"backend_mode\":\"simulated\",\"model_id\":\"planner-cpu-%s\"}" .Values.modelVersion -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: planner-model-{{ .Values.modelVersion | lower }}
+data:
+  model.json: {{ $model | quote }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: planner
+spec:
+  {{- if not .Values.hpa.enabled }}
+  replicas: {{ .Values.replicas }}
+  {{- end }}
+  revisionHistoryLimit: 4
+  progressDeadlineSeconds: 100
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxUnavailable: 0, maxSurge: 1}
+  selector:
+    matchLabels: {app: planner}
+  template:
+    metadata:
+      labels: {app: planner}
+      annotations:
+        prometheus.io/scrape: 'true'
+    spec:
+      terminationGracePeriodSeconds: 40
+      containers:
+      - name: api
+        image: {{ .Values.image }}
+        imagePullPolicy: IfNotPresent
+        ports: [{containerPort: 8091, name: http}]
+        resources:
+          requests: {cpu: {{ .Values.cpuRequest | quote }}, memory: {{ .Values.memoryRequest }}}
+          limits: {cpu: {{ .Values.cpuLimit | quote }}, memory: {{ .Values.memoryLimit }}}
+        env:
+        - name: POD_NAME
+          valueFrom: {fieldRef: {fieldPath: metadata.name}}
+        - {name: MODEL_FILE, value: /model/model.json}
+        - {name: MODEL_SHA256, value: {{ $model | sha256sum | quote }}}
+        - {name: WARMUP_SECONDS, value: {{ .Values.warmupSeconds | quote }}}
+        - {name: BROKEN_PROBES, value: {{ .Values.brokenProbes | quote }}}
+        - {name: NEVER_READY, value: {{ .Values.neverReady | quote }}}
+        - {name: CACHE_HIT_CPU_MS, value: {{ .Values.cacheHitCpuMs | quote }}}
+        - {name: CACHE_MISS_CPU_MS, value: {{ .Values.cacheMissCpuMs | quote }}}
+        - {name: CACHE_ENTRIES, value: {{ .Values.cacheEntries | quote }}}
+        - {name: MAX_RUNNING, value: {{ .Values.maxRunning | quote }}}
+        - {name: MAX_WAITING, value: {{ .Values.maxWaiting | quote }}}
+        volumeMounts: [{name: model, mountPath: /model, readOnly: true}]
+        startupProbe:
+          httpGet: {path: /startup, port: http}
+          periodSeconds: 1
+          failureThreshold: 90
+        readinessProbe:
+          httpGet: {path: /ready, port: http}
+          periodSeconds: 1
+          failureThreshold: 1
+        livenessProbe:
+          httpGet: {path: /health, port: http}
+          periodSeconds: 5
+          failureThreshold: 3
+        lifecycle:
+          preStop:
+            exec:
+              command: [python, -c, "import urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8091/admin/drain', data=b'',method='POST'),timeout=5).read()"]
+      volumes:
+      - name: model
+        configMap: {name: planner-model-{{ .Values.modelVersion | lower }}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: planner}
+spec:
+  selector: {app: planner}
+  sessionAffinity: None
+  ports: [{port: 8091, targetPort: http}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: planner-sticky}
+spec:
+  selector: {app: planner}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP: {timeoutSeconds: 10800}
+  ports: [{port: 8091, targetPort: http}]
+{{- if .Values.hpa.enabled }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: {name: planner}
+spec:
+  minReplicas: 2
+  maxReplicas: 3
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: planner}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target: {type: Utilization, averageUtilization: {{ .Values.hpa.target }}}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 30
+      policies: [{type: Pods, value: 1, periodSeconds: 15}]
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies: [{type: Pods, value: 1, periodSeconds: 15}]
+{{- end }}

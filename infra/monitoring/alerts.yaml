@@ -1,0 +1,13 @@
+groups:
+- name: planner
+  rules:
+  - alert: PlannerLatency
+    expr: histogram_quantile(0.95, sum by (le) (rate(planner_ttfc_seconds_bucket[30s]))) > 0.6 and sum(increase(planner_ttfc_seconds_count[30s])) >= 20
+    for: 10s
+    labels: {severity: warning}
+    annotations: {summary: 'TTFC p95 >0.6s, at least 20 first chunks /30s'}
+  - alert: PlannerRejects
+    expr: sum(rate(planner_requests_total{outcome=~"rejected|unready|interrupted"}[30s])) / sum(rate(planner_requests_total[30s])) > 0.05 and sum(increase(planner_requests_total[30s])) >= 20
+    for: 10s
+    labels: {severity: warning}
+    annotations: {summary: 'Reject/interruption fraction >5%, at least 20 outcomes /30s'}

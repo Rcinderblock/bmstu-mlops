@@ -1,0 +1,11 @@
+FROM python:3.12.12-slim-bookworm
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+WORKDIR /app
+COPY requirements-k8s.txt .
+RUN pip install --no-cache-dir --require-hashes -r requirements-k8s.txt
+COPY service.py release.py .
+COPY src ./src
+COPY scripts/hw11 ./scripts/hw11
+# Importing the accepted backend must stay lazy in simulated mode.
+USER 10001:10001
+CMD ["python", "service.py", "--backend-mode", "simulated", "--host", "0.0.0.0", "--port", "8091"]

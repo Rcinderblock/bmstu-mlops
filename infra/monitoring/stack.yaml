@@ -1,0 +1,272 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: mlops-hw11
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prometheus
+  namespace: mlops-hw11
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prometheus
+  namespace: mlops-hw11
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: mlops-hw11
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prometheus
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: mlops-hw11
+data:
+  prometheus.yaml: "global:\n  scrape_interval: 5s\n  evaluation_interval: 5s\nrule_files:\
+    \ [/etc/prometheus/alerts.yaml]\nscrape_configs:\n- job_name: planner-pods\n \
+    \ kubernetes_sd_configs:\n  - role: pod\n    namespaces: {names: [mlops-hw11]}\n\
+    \  relabel_configs:\n  - source_labels: [__meta_kubernetes_pod_label_app]\n  \
+    \  action: keep\n    regex: planner\n  - source_labels: [__meta_kubernetes_pod_container_port_name]\n\
+    \    action: keep\n    regex: http\n  - source_labels: [__meta_kubernetes_pod_name]\n\
+    \    target_label: pod\n"
+  alerts.yaml: "groups:\n- name: planner\n  rules:\n  - alert: PlannerLatency\n  \
+    \  expr: histogram_quantile(0.95, sum by (le) (rate(planner_ttfc_seconds_bucket[30s])))\
+    \ > 0.6 and sum(increase(planner_ttfc_seconds_count[30s])) >= 20\n    for: 10s\n\
+    \    labels: {severity: warning}\n    annotations: {summary: 'TTFC p95 >0.6s,\
+    \ at least 20 first chunks /30s'}\n  - alert: PlannerRejects\n    expr: sum(rate(planner_requests_total{outcome=~\"\
+    rejected|unready|interrupted\"}[30s])) / sum(rate(planner_requests_total[30s]))\
+    \ > 0.05 and sum(increase(planner_requests_total[30s])) >= 20\n    for: 10s\n\
+    \    labels: {severity: warning}\n    annotations: {summary: 'Reject/interruption\
+    \ fraction >5%, at least 20 outcomes /30s'}\n"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: mlops-hw11
+data:
+  datasource.yaml: "apiVersion: 1\ndatasources:\n- access: proxy\n  isDefault: true\n\
+    \  name: Prometheus\n  type: prometheus\n  uid: prometheus\n  url: http://prometheus:9090\n"
+  dashboard.yaml: "apiVersion: 1\nproviders:\n- name: planner\n  options:\n    path:\
+    \ /dashboards\n  type: file\n"
+  dashboard.json: "{\n  \"uid\": \"planner-hw11\",\n  \"title\": \"MLOps — Kubernetes\
+    \ CPU simulator\",\n  \"schemaVersion\": 39,\n  \"version\": 1,\n  \"refresh\"\
+    : \"5s\",\n  \"time\": {\n    \"from\": \"now-15m\",\n    \"to\": \"now\"\n  },\n\
+    \  \"panels\": [\n    {\n      \"id\": 1,\n      \"type\": \"timeseries\",\n \
+    \     \"title\": \"До первой части, с\",\n      \"gridPos\": {\n        \"x\"\
+    : 0,\n        \"y\": 0,\n        \"w\": 12,\n        \"h\": 8\n      },\n    \
+    \  \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\
+    \n      },\n      \"targets\": [\n        {\n          \"expr\": \"histogram_quantile(0.95,\
+    \ sum by (le,pod) (rate(planner_ttfc_seconds_bucket[30s])))\",\n          \"legendFormat\"\
+    : \"{{pod}} {{outcome}}\"\n        }\n      ],\n      \"fieldConfig\": {\n   \
+    \     \"defaults\": {\n          \"unit\": \"s\"\n        },\n        \"overrides\"\
+    : []\n      }\n    },\n    {\n      \"id\": 2,\n      \"type\": \"timeseries\"\
+    ,\n      \"title\": \"Полный ответ, с\",\n      \"gridPos\": {\n        \"x\"\
+    : 12,\n        \"y\": 0,\n        \"w\": 12,\n        \"h\": 8\n      },\n   \
+    \   \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"\
+    prometheus\"\n      },\n      \"targets\": [\n        {\n          \"expr\": \"\
+    histogram_quantile(0.95, sum by (le,pod) (rate(planner_duration_seconds_bucket[30s])))\"\
+    ,\n          \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n      ],\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"s\"\n\
+    \        },\n        \"overrides\": []\n      }\n    },\n    {\n      \"id\":\
+    \ 3,\n      \"type\": \"timeseries\",\n      \"title\": \"Работают / ждут по Pod\"\
+    ,\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 8,\n        \"w\":\
+    \ 12,\n        \"h\": 8\n      },\n      \"datasource\": {\n        \"type\":\
+    \ \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"targets\"\
+    : [\n        {\n          \"expr\": \"planner_running or planner_waiting\",\n\
+    \          \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n      ],\n  \
+    \    \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"short\"\
+    \n        },\n        \"overrides\": []\n      }\n    },\n    {\n      \"id\"\
+    : 4,\n      \"type\": \"timeseries\",\n      \"title\": \"Завершений в секунду\"\
+    ,\n      \"gridPos\": {\n        \"x\": 12,\n        \"y\": 8,\n        \"w\"\
+    : 12,\n        \"h\": 8\n      },\n      \"datasource\": {\n        \"type\":\
+    \ \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"targets\"\
+    : [\n        {\n          \"expr\": \"sum by(pod) (rate(planner_requests_total{outcome=\\\
+    \"completed\\\"}[30s]))\",\n          \"legendFormat\": \"{{pod}} {{outcome}}\"\
+    \n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n   \
+    \       \"unit\": \"reqps\"\n        },\n        \"overrides\": []\n      }\n\
+    \    },\n    {\n      \"id\": 5,\n      \"type\": \"timeseries\",\n      \"title\"\
+    : \"Отказы и обрывы /с\",\n      \"gridPos\": {\n        \"x\": 0,\n        \"\
+    y\": 16,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"datasource\"\
+    : {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n    \
+    \  },\n      \"targets\": [\n        {\n          \"expr\": \"sum by(pod,outcome)\
+    \ (rate(planner_requests_total{outcome!=\\\"completed\\\"}[30s]))\",\n       \
+    \   \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n      ],\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"unit\": \"reqps\"\n        },\n    \
+    \    \"overrides\": []\n      }\n    },\n    {\n      \"id\": 6,\n      \"type\"\
+    : \"timeseries\",\n      \"title\": \"CPU процесса, ядер\",\n      \"gridPos\"\
+    : {\n        \"x\": 12,\n        \"y\": 16,\n        \"w\": 12,\n        \"h\"\
+    : 8\n      },\n      \"datasource\": {\n        \"type\": \"prometheus\",\n  \
+    \      \"uid\": \"prometheus\"\n      },\n      \"targets\": [\n        {\n  \
+    \        \"expr\": \"rate(process_cpu_seconds_total[30s])\",\n          \"legendFormat\"\
+    : \"{{pod}} {{outcome}}\"\n        }\n      ],\n      \"fieldConfig\": {\n   \
+    \     \"defaults\": {\n          \"unit\": \"short\"\n        },\n        \"overrides\"\
+    : []\n      }\n    },\n    {\n      \"id\": 7,\n      \"type\": \"timeseries\"\
+    ,\n      \"title\": \"RSS процесса, байт\",\n      \"gridPos\": {\n        \"\
+    x\": 0,\n        \"y\": 24,\n        \"w\": 12,\n        \"h\": 8\n      },\n\
+    \      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\":\
+    \ \"prometheus\"\n      },\n      \"targets\": [\n        {\n          \"expr\"\
+    : \"process_resident_memory_bytes\",\n          \"legendFormat\": \"{{pod}} {{outcome}}\"\
+    \n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n   \
+    \       \"unit\": \"bytes\"\n        },\n        \"overrides\": []\n      }\n\
+    \    },\n    {\n      \"id\": 8,\n      \"type\": \"timeseries\",\n      \"title\"\
+    : \"Прогретых реплик\",\n      \"gridPos\": {\n        \"x\": 12,\n        \"\
+    y\": 24,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"datasource\"\
+    : {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n    \
+    \  },\n      \"targets\": [\n        {\n          \"expr\": \"sum(planner_ready)\"\
+    ,\n          \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n      ],\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"short\"\
+    \n        },\n        \"overrides\": []\n      }\n    },\n    {\n      \"id\"\
+    : 9,\n      \"type\": \"timeseries\",\n      \"title\": \"Очередь p95, с\",\n\
+    \      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 32,\n        \"w\": 12,\n\
+    \        \"h\": 8\n      },\n      \"datasource\": {\n        \"type\": \"prometheus\"\
+    ,\n        \"uid\": \"prometheus\"\n      },\n      \"targets\": [\n        {\n\
+    \          \"expr\": \"histogram_quantile(0.95, sum by(le,pod) (rate(planner_queue_seconds_bucket[30s])))\"\
+    ,\n          \"legendFormat\": \"{{pod}} {{outcome}}\"\n        }\n      ],\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"s\"\n\
+    \        },\n        \"overrides\": []\n      }\n    }\n  ]\n}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: mlops-hw11
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      securityContext:
+        fsGroup: 65534
+      containers:
+      - args:
+        - --config.file=/etc/prometheus/prometheus.yaml
+        - --storage.tsdb.path=/prometheus
+        - --storage.tsdb.retention.time=2h
+        - --storage.tsdb.retention.size=128MB
+        volumeMounts:
+        - name: config
+          mountPath: /etc/prometheus
+        - name: storage
+          mountPath: /prometheus
+        name: prometheus
+        image: prom/prometheus:v3.5.0
+        ports:
+        - containerPort: 9090
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+      volumes:
+      - name: config
+        configMap:
+          name: prometheus-config
+      - name: storage
+        emptyDir:
+          sizeLimit: 256Mi
+      serviceAccountName: prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: mlops-hw11
+spec:
+  selector:
+    app: prometheus
+  ports:
+  - port: 9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: mlops-hw11
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      securityContext:
+        fsGroup: 472
+      containers:
+      - env:
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: 'true'
+        - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+          value: Viewer
+        - name: GF_ANALYTICS_REPORTING_ENABLED
+          value: 'false'
+        - name: GF_ANALYTICS_CHECK_FOR_UPDATES
+          value: 'false'
+        volumeMounts:
+        - name: config
+          mountPath: /etc/grafana/provisioning/datasources/datasource.yaml
+          subPath: datasource.yaml
+        - name: config
+          mountPath: /etc/grafana/provisioning/dashboards/dashboard.yaml
+          subPath: dashboard.yaml
+        - name: config
+          mountPath: /dashboards/dashboard.json
+          subPath: dashboard.json
+        - name: storage
+          mountPath: /var/lib/grafana
+        name: grafana
+        image: grafana/grafana:12.2.0
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+      volumes:
+      - name: config
+        configMap:
+          name: grafana-config
+      - name: storage
+        emptyDir:
+          sizeLimit: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: mlops-hw11
+spec:
+  selector:
+    app: grafana
+  ports:
+  - port: 3000

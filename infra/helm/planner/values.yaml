@@ -1,0 +1,18 @@
+image: planner-hw11:v2
+replicas: 2
+modelVersion: A
+warmupSeconds: 20
+brokenProbes: false
+neverReady: false
+cacheHitCpuMs: 5
+cacheMissCpuMs: 80
+cacheEntries: 8
+maxRunning: 1
+maxWaiting: 32
+cpuRequest: 100m
+cpuLimit: '1'
+memoryRequest: 64Mi
+memoryLimit: 192Mi
+hpa:
+  enabled: false
+  target: 65

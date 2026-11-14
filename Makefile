@@ -33,3 +33,13 @@ up:
 	docker compose -p mlops-hw6 up -d --no-build --wait
 down:
 	docker compose -p mlops-hw6 down
+
+.PHONY: k8s-build k8s-test k8s-balance k8s-autoscale
+k8s-build:
+	docker build -f Dockerfile.k8s -t planner-hw11:v2 .
+k8s-test:
+	python3 tests/hw11/test_cluster.py
+k8s-balance:
+	python3 scripts/hw11/run_balance.py
+k8s-autoscale:
+	python3 scripts/hw11/run_autoscale.py

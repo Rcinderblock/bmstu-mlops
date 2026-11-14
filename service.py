@@ -135,6 +135,8 @@ def create_app(root, warmup_seconds=0, backend_factory=None, debug=False):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--backend-mode', choices=['accepted','simulated'], default='accepted')
+    parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--workspace', type=Path, default=Path('.lab'))
     parser.add_argument('--port', type=int, default=8091)
     parser.add_argument('--warmup-seconds', type=float, default=0)
@@ -144,8 +146,13 @@ def main():
         parser.error('warmup-seconds должен быть неотрицательным')
     import uvicorn
     print('API http://127.0.0.1:' + str(args.port), flush=True)
-    uvicorn.run(create_app(args.workspace, args.warmup_seconds, debug=args.debug),
-                host='127.0.0.1', port=args.port, log_level='warning', access_log=False)
+    if args.backend_mode == 'simulated':
+        from src.cluster_api import create_simulated_app
+        app = create_simulated_app()
+    else:
+        app = create_app(args.workspace, args.warmup_seconds, debug=args.debug)
+    uvicorn.run(app,
+                host=args.host, port=args.port, log_level='warning', access_log=False)
 
 
 if __name__ == '__main__':
